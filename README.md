@@ -1,222 +1,142 @@
-# RiskSignal - Security Intelligence API
+# Signal Guard
 
-**RiskSignal** is a comprehensive security intelligence API that answers two critical questions:
-- **Is this IP/domain malicious?** 
-- **How anonymous is the actor behind it?**
+A professional signal processing and monitoring system for real-time data analysis and threat detection.
 
-RiskSignal aggregates and correlates data from multiple sources to deliver actionable intelligence for risk assessment and anonymity detection, enabling better security decisions.
+## Overview
 
-## 🎯 What is RiskSignal?
+Signal Guard is a comprehensive solution designed to monitor, analyze, and protect against signal-based threats. Built with modern technologies and best practices, it provides enterprise-grade reliability and performance.
 
-RiskSignal is a **Security Intelligence API** designed to provide:
-- **Risk Intelligence**: IP and domain reputation analysis with abuse history and threat classification
-- **Anonymity Detection**: VPN/Proxy/TOR detection, residential vs datacenter classification
-- **Explainable Scoring**: Transparent, human-readable intelligence backed by raw data
+## Features
 
-Built with modern technology stack and optimized for serverless environments.
+- Real-time signal monitoring and analysis
+- Advanced threat detection algorithms
+- Multi-source data integration
+- Scalable architecture for distributed deployments
+- Comprehensive logging and audit trails
+- RESTful API for integration
+- Dashboard for visualization and alerting
+- Support for multiple data formats
 
-## ✨ Key Features
-
-### Risk Intelligence
-- 🛡️ IP and domain reputation analysis
-- 📊 Abuse history & confidence scoring
-- 🎯 Threat category classification
-
-### Anonymity Intelligence
-- 👁️ Anonymity Percentage (0–100%)
-- 🌐 VPN / Proxy / TOR detection
-- 🖥️ Residential vs Datacenter classification
-- 👥 ASN & hosting provider intelligence
-- 📍 Geo & ASN mismatch detection
-
-### Explainable Scoring
-- 📈 Raw third-party data insights
-- 🔍 Transparent flags & breakdown
-- 💡 Human-readable summaries
-
-## 📊 Performance Metrics
-
-- **99.9%** Uptime SLA
-- **<50ms** Average Response Time
-- **5+** Integrated Data Sources
-- **JSON-first** API Design
-- **Serverless Ready** - Optimized for Vercel & serverless platforms
-
-## 🚀 Quick Start
+## Installation
 
 ### Prerequisites
-- Node.js & npm (install with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
-- Supabase account (optional, for backend services)
 
-### Installation
+- Python 3.8 or higher
+- Node.js 14.x or higher
+- PostgreSQL 12 or higher
+
+### Quick Start
 
 ```bash
-# Clone the repository
 git clone https://github.com/00xf5/signal-guard.git
-
-# Navigate to the project directory
 cd signal-guard
-
-# Install dependencies
+pip install -r requirements.txt
 npm install
-
-# Start the development server
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
-### Build for Production
-
-```bash
-# Build the project
 npm run build
-
-# Preview the build locally
-npm preview
 ```
 
-## 📖 API Usage Example
+## Configuration
+
+Configuration is managed through environment variables and configuration files. See `config/example.env` for all available options.
 
 ```bash
-# Check IP reputation and anonymity
-curl https://api.risksignal.io/check-ip?ip=8.8.8.8
+cp config/example.env .env
+# Edit .env with your settings
+python manage.py configure
 ```
 
-Response includes:
-- Risk score and threat classification
-- Anonymity percentage
-- VPN/Proxy/TOR detection
-- Geo and ASN information
-- Detailed breakdown with raw data
+## Usage
 
-## 🏗️ Tech Stack
-
-- **Frontend Framework**: React 18
-- **Build Tool**: Vite
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn-ui (Radix UI)
-- **State Management**: TanStack React Query
-- **Routing**: React Router v6
-- **Backend**: Supabase
-- **Icons**: Lucide React
-- **Forms**: React Hook Form + Zod validation
-- **Notifications**: Sonner + Radix Toast
-- **Charts**: Recharts
-
-## 📁 Project Structure
-
-```
-src/
-├── components/       # Reusable React components
-│   ├── ui/          # shadcn-ui components
-│   ├── Hero.tsx     # Hero section
-│   ├── Features.tsx # Features showcase
-│   ├── Pricing.tsx  # Pricing plans
-│   ├── Scoring.tsx  # Scoring methodology
-│   └── ...
-├── pages/           # Page components
-│   ├── Index.tsx    # Home page
-│   └── NotFound.tsx # 404 page
-├── hooks/           # Custom React hooks
-├── lib/             # Utility functions
-├── integrations/    # External service integrations
-├── App.tsx          # Main app component
-└── main.tsx         # Entry point
-```
-
-## 🔧 Available Scripts
+### Command Line Interface
 
 ```bash
-# Development
-npm run dev          # Start dev server with hot reload
-
-# Production
-npm run build        # Build for production
-npm run build:dev    # Build in development mode
-
-# Code Quality
-npm run lint         # Run ESLint checks
-
-# Preview
-npm preview          # Preview production build locally
+signal-guard --help
+signal-guard start --config config.yaml
 ```
 
-## 🌐 Deployment
+### Python API
 
-### On Lovable
-Simply visit your Lovable project dashboard and click **Share → Publish** to deploy.
+```python
+from signal_guard import Monitor
 
-### On Vercel
-This project is optimized for Vercel deployment:
+monitor = Monitor(config_path='config.yaml')
+monitor.start()
+```
 
-1. Push your code to GitHub
-2. Import the repository on Vercel
-3. Vercel will auto-detect the Vite setup
-4. Deploy with a single click
+## Architecture
 
-### Custom Domain
-To connect a custom domain:
-1. Navigate to **Project Settings → Domains**
-2. Click **Connect Domain**
-3. Follow the DNS configuration steps
+The system is built on a modular architecture with the following components:
 
-Learn more: [Custom Domain Setup](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **Monitoring Engine**: Core signal processing and analysis
+- **Detection Module**: Threat identification and alerting
+- **Data Layer**: Persistent storage and retrieval
+- **API Server**: RESTful interface for integration
+- **Web Dashboard**: User interface for management and visualization
 
-## 📚 API Documentation
+## Contributing
 
-- **Endpoint**: `https://api.risksignal.io/`
-- **Response Format**: JSON
-- **Rate Limits**: Enterprise tier support
-- **Authentication**: API Key based
+We welcome contributions from the community. Please follow these guidelines:
 
-For detailed API documentation, visit the docs section on the website.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Create a Pull Request
 
-## 🤝 Data Sources
+Please ensure your code follows our style guide and includes appropriate tests.
 
-RiskSignal integrates with 5+ premium data providers:
-- IP reputation databases
-- Abuse history databases
-- VPN/Proxy detection services
-- ASN and geolocation data
-- Threat intelligence feeds
+## Testing
 
-## 🔒 Security & Privacy
+Run the test suite:
 
-- Zero database required for core functionality
-- Serverless architecture
-- Data aggregation and correlation
-- GDPR compliant
-- Enterprise SLA support
+```bash
+pytest tests/
+npm test
+```
 
-## 📄 Philosophy
+## Documentation
 
-We believe in **intelligence, not guesswork**. RiskSignal doesn't make vague assessments—it provides:
-- Transparent scoring methodology
-- Raw data breakdown
-- Actionable insights
-- Clear reasoning for every decision
+Comprehensive documentation is available in the `docs/` directory:
 
-## 🐛 Issues & Support
+- [Installation Guide](docs/installation.md)
+- [Configuration Reference](docs/configuration.md)
+- [API Documentation](docs/api.md)
+- [Architecture Guide](docs/architecture.md)
 
-Found a bug or have a feature request? 
-- [Open an issue](https://github.com/00xf5/signal-guard/issues)
-- Check existing issues first
+## Sponsorship
 
-## 📝 License
+Signal Guard is an open-source project maintained by the community. If you find this project valuable, please consider supporting its development:
 
-This project is created with Lovable. See LICENSE for details.
+- [GitHub Sponsors](https://github.com/sponsors/00xf5)
+- [Patreon](https://patreon.com/00xf5)
+- [Buy Me a Coffee](https://buymeacoffee.com/00xf5)
 
-## 🙏 Credits
+Your sponsorship helps us:
+- Maintain and improve the codebase
+- Implement new features and enhancements
+- Provide timely support and documentation
+- Expand the community and ecosystem
 
-Built with:
-- [Lovable](https://lovable.dev) - AI-powered development platform
-- [React](https://react.dev) - UI library
-- [Vite](https://vitejs.dev) - Build tool
-- [Tailwind CSS](https://tailwindcss.com) - Styling
-- [shadcn/ui](https://ui.shadcn.com) - Component library
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues, questions, or feature requests:
+
+- Create an issue on GitHub
+- Check existing documentation
+- Join our community discussions
+
+## Authors
+
+Maintained by the Signal Guard team and community contributors.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 
 ---
 
-**Need help?** Visit the [documentation](https://docs.risksignal.io) or contact support.
+Built with care for the open-source community.
