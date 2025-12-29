@@ -20,8 +20,8 @@ const Header = () => {
           <a href="#scoring" className="text-muted-foreground hover:text-foreground transition-colors">
             Scoring
           </a>
-          <a href="#sources" className="text-muted-foreground hover:text-foreground transition-colors">
-            Sources
+          <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+            Pricing
           </a>
         </nav>
 
