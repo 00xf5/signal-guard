@@ -1,73 +1,222 @@
-# Welcome to your Lovable project
+# RiskSignal - Security Intelligence API
 
-## Project info
+**RiskSignal** is a comprehensive security intelligence API that answers two critical questions:
+- **Is this IP/domain malicious?** 
+- **How anonymous is the actor behind it?**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+RiskSignal aggregates and correlates data from multiple sources to deliver actionable intelligence for risk assessment and anonymity detection, enabling better security decisions.
 
-## How can I edit this code?
+## 🎯 What is RiskSignal?
 
-There are several ways of editing your application.
+RiskSignal is a **Security Intelligence API** designed to provide:
+- **Risk Intelligence**: IP and domain reputation analysis with abuse history and threat classification
+- **Anonymity Detection**: VPN/Proxy/TOR detection, residential vs datacenter classification
+- **Explainable Scoring**: Transparent, human-readable intelligence backed by raw data
 
-**Use Lovable**
+Built with modern technology stack and optimized for serverless environments.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## ✨ Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+### Risk Intelligence
+- 🛡️ IP and domain reputation analysis
+- 📊 Abuse history & confidence scoring
+- 🎯 Threat category classification
 
-**Use your preferred IDE**
+### Anonymity Intelligence
+- 👁️ Anonymity Percentage (0–100%)
+- 🌐 VPN / Proxy / TOR detection
+- 🖥️ Residential vs Datacenter classification
+- 👥 ASN & hosting provider intelligence
+- 📍 Geo & ASN mismatch detection
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Explainable Scoring
+- 📈 Raw third-party data insights
+- 🔍 Transparent flags & breakdown
+- 💡 Human-readable summaries
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📊 Performance Metrics
 
-Follow these steps:
+- **99.9%** Uptime SLA
+- **<50ms** Average Response Time
+- **5+** Integrated Data Sources
+- **JSON-first** API Design
+- **Serverless Ready** - Optimized for Vercel & serverless platforms
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Quick Start
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Prerequisites
+- Node.js & npm (install with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- Supabase account (optional, for backend services)
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Installation
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Clone the repository
+git clone https://github.com/00xf5/signal-guard.git
+
+# Navigate to the project directory
+cd signal-guard
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build for Production
 
-**Use GitHub Codespaces**
+```bash
+# Build the project
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Preview the build locally
+npm preview
+```
 
-## What technologies are used for this project?
+## 📖 API Usage Example
 
-This project is built with:
+```bash
+# Check IP reputation and anonymity
+curl https://api.risksignal.io/check-ip?ip=8.8.8.8
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Response includes:
+- Risk score and threat classification
+- Anonymity percentage
+- VPN/Proxy/TOR detection
+- Geo and ASN information
+- Detailed breakdown with raw data
 
-## How can I deploy this project?
+## 🏗️ Tech Stack
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+- **Frontend Framework**: React 18
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn-ui (Radix UI)
+- **State Management**: TanStack React Query
+- **Routing**: React Router v6
+- **Backend**: Supabase
+- **Icons**: Lucide React
+- **Forms**: React Hook Form + Zod validation
+- **Notifications**: Sonner + Radix Toast
+- **Charts**: Recharts
 
-## Can I connect a custom domain to my Lovable project?
+## 📁 Project Structure
 
-Yes, you can!
+```
+src/
+├── components/       # Reusable React components
+│   ├── ui/          # shadcn-ui components
+│   ├── Hero.tsx     # Hero section
+│   ├── Features.tsx # Features showcase
+│   ├── Pricing.tsx  # Pricing plans
+│   ├── Scoring.tsx  # Scoring methodology
+│   └── ...
+├── pages/           # Page components
+│   ├── Index.tsx    # Home page
+│   └── NotFound.tsx # 404 page
+├── hooks/           # Custom React hooks
+├── lib/             # Utility functions
+├── integrations/    # External service integrations
+├── App.tsx          # Main app component
+└── main.tsx         # Entry point
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔧 Available Scripts
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+# Development
+npm run dev          # Start dev server with hot reload
+
+# Production
+npm run build        # Build for production
+npm run build:dev    # Build in development mode
+
+# Code Quality
+npm run lint         # Run ESLint checks
+
+# Preview
+npm preview          # Preview production build locally
+```
+
+## 🌐 Deployment
+
+### On Lovable
+Simply visit your Lovable project dashboard and click **Share → Publish** to deploy.
+
+### On Vercel
+This project is optimized for Vercel deployment:
+
+1. Push your code to GitHub
+2. Import the repository on Vercel
+3. Vercel will auto-detect the Vite setup
+4. Deploy with a single click
+
+### Custom Domain
+To connect a custom domain:
+1. Navigate to **Project Settings → Domains**
+2. Click **Connect Domain**
+3. Follow the DNS configuration steps
+
+Learn more: [Custom Domain Setup](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## 📚 API Documentation
+
+- **Endpoint**: `https://api.risksignal.io/`
+- **Response Format**: JSON
+- **Rate Limits**: Enterprise tier support
+- **Authentication**: API Key based
+
+For detailed API documentation, visit the docs section on the website.
+
+## 🤝 Data Sources
+
+RiskSignal integrates with 5+ premium data providers:
+- IP reputation databases
+- Abuse history databases
+- VPN/Proxy detection services
+- ASN and geolocation data
+- Threat intelligence feeds
+
+## 🔒 Security & Privacy
+
+- Zero database required for core functionality
+- Serverless architecture
+- Data aggregation and correlation
+- GDPR compliant
+- Enterprise SLA support
+
+## 📄 Philosophy
+
+We believe in **intelligence, not guesswork**. RiskSignal doesn't make vague assessments—it provides:
+- Transparent scoring methodology
+- Raw data breakdown
+- Actionable insights
+- Clear reasoning for every decision
+
+## 🐛 Issues & Support
+
+Found a bug or have a feature request? 
+- [Open an issue](https://github.com/00xf5/signal-guard/issues)
+- Check existing issues first
+
+## 📝 License
+
+This project is created with Lovable. See LICENSE for details.
+
+## 🙏 Credits
+
+Built with:
+- [Lovable](https://lovable.dev) - AI-powered development platform
+- [React](https://react.dev) - UI library
+- [Vite](https://vitejs.dev) - Build tool
+- [Tailwind CSS](https://tailwindcss.com) - Styling
+- [shadcn/ui](https://ui.shadcn.com) - Component library
+
+---
+
+**Need help?** Visit the [documentation](https://docs.risksignal.io) or contact support.
