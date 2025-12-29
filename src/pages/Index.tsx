@@ -4,6 +4,7 @@ import Features from "@/components/Features";
 import ApiDemo from "@/components/ApiDemo";
 import Scoring from "@/components/Scoring";
 import DataSources from "@/components/DataSources";
+import Pricing from "@/components/Pricing";
 import Philosophy from "@/components/Philosophy";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
@@ -18,6 +19,7 @@ const Index = () => {
         <ApiDemo />
         <Scoring />
         <DataSources />
+        <Pricing />
         <Philosophy />
         <CTA />
       </main>
