@@ -1,31 +1,33 @@
 import Header from "@/components/Header";
+import ThemeProvider, { useTheme } from "@/contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import ApiDemo from "@/components/ApiDemo";
 import Scoring from "@/components/Scoring";
 import DataSources from "@/components/DataSources";
-import Pricing from "@/components/Pricing";
 import Philosophy from "@/components/Philosophy";
-import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  const { theme } = useTheme();
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-14">
-        <Hero />
-        <Features />
-        <ApiDemo />
-        <Scoring />
-        <DataSources />
-        <Pricing />
-        <Philosophy />
-        <CTA />
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className={`min-h-screen bg-background ${theme === 'dark' ? 'dark' : 'light'}`}>
+        <Header />
+        <ThemeToggle />
+        <main className="pt-14">
+          <Hero />
+          <Features />
+          <Scoring />
+          <DataSources />
+          <Philosophy />
+        </main>
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 };
 
 export default Index;
+

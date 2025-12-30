@@ -1,8 +1,8 @@
-import { 
-  Shield, 
-  Eye, 
-  Brain, 
-  Zap, 
+import {
+  Shield,
+  Eye,
+  Brain,
+  Zap,
   Database,
   Globe,
   AlertTriangle,
@@ -59,7 +59,7 @@ const Features = () => {
               Intelligence, not guesswork.
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              RiskSignal aggregates and correlates data from multiple providers to deliver 
+              RiskSignal aggregates and correlates data from multiple providers to deliver
               actionable intelligence — not vibes.
             </p>
           </div>
@@ -89,16 +89,11 @@ const Features = () => {
           ))}
         </div>
 
-        {/* Serverless badge */}
-        <ScrollReveal delay={400}>
-          <div className="mt-16 flex items-center gap-4 text-sm text-muted-foreground border border-border p-4 max-w-fit">
-            <Zap className="w-4 h-4 text-warning animate-pulse" />
-            <span>Serverless & Fast — Designed for Vercel / serverless environments. JSON-first API. No database required.</span>
-          </div>
-        </ScrollReveal>
+        {/* Serverless badge removed as per request */}
       </div>
     </section>
   );
 };
 
 export default Features;
+

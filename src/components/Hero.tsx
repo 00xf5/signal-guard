@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight } from "lucide-react";
+import { Shield } from "lucide-react";
 import IPLookupDemo from "./IPLookupDemo";
 
 const Hero = () => {
@@ -21,7 +20,7 @@ const Hero = () => {
             {/* Badge */}
             <div className="fade-in flex items-center gap-2 mb-6 text-muted-foreground text-sm">
               <Shield className="w-4 h-4" />
-              <span>Security Intelligence API</span>
+              <span>Security Intelligence</span>
             </div>
 
             {/* Main headline */}
@@ -33,37 +32,9 @@ const Hero = () => {
 
             {/* Subheadline */}
             <p className="fade-in fade-in-delay-2 text-base md:text-lg text-muted-foreground max-w-xl mb-6 leading-relaxed">
-              RiskSignal answers two critical questions: Is this IP/domain malicious? 
+              RiskSignal answers two critical questions: Is this IP/domain malicious?
               How anonymous is the actor behind it?
             </p>
-
-            {/* Terminal-style question */}
-            <div className="fade-in fade-in-delay-3 code-block mb-8 max-w-xl">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-                <span className="w-3 h-3 rounded-full bg-danger/60" />
-                <span className="w-3 h-3 rounded-full bg-warning/60" />
-                <span className="w-3 h-3 rounded-full bg-success/60" />
-                <span className="ml-2">risksignal</span>
-              </div>
-              <code className="text-sm md:text-base">
-                <span className="text-muted-foreground">$</span>{" "}
-                <span className="text-foreground">curl</span>{" "}
-                <span className="text-muted-foreground">https://api.risksignal.io/check-ip?ip=</span>
-                <span className="text-foreground">8.8.8.8</span>
-                <span className="terminal-cursor">_</span>
-              </code>
-            </div>
-
-            {/* CTAs */}
-            <div className="fade-in fade-in-delay-4 flex flex-wrap gap-4 mb-8 lg:mb-0">
-              <Button variant="hero" size="lg">
-                Get API Access
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="lg">
-                View Documentation
-              </Button>
-            </div>
 
             {/* Stats - Hidden on mobile, shown on lg */}
             <div className="fade-in fade-in-delay-4 hidden lg:grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-border max-w-xl">
@@ -109,3 +80,4 @@ const Hero = () => {
 };
 
 export default Hero;
+

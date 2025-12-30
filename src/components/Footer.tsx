@@ -11,27 +11,11 @@ const Footer = () => {
               <span>RiskSignal</span>
             </a>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Security intelligence API for risk scoring and anonymity detection.
+              Security intelligence for risk scoring and anonymity detection.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-8 text-sm">
-            <div>
-              <h4 className="font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#api" className="hover:text-foreground transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Resources</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">GitHub</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Status</a></li>
-              </ul>
-            </div>
             <div>
               <h4 className="font-semibold mb-3">Legal</h4>
               <ul className="space-y-2 text-muted-foreground">
@@ -54,3 +38,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
