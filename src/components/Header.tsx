@@ -5,9 +5,10 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="container flex items-center justify-between h-14">
         <a href="/" className="flex items-center gap-2 font-semibold">
-          <Shield className="w-5 h-5" />
+          <img src="/favicon.png" alt="RiskSignal" className="w-6 h-6 object-contain" />
           <span>RiskSignal</span>
         </a>
+
 
         <nav className="hidden md:flex items-center gap-8 text-sm">
           <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">

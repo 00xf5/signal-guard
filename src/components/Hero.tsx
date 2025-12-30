@@ -17,11 +17,11 @@ const Hero = () => {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Column - Content */}
           <div className="order-1">
-            {/* Badge */}
-            <div className="fade-in flex items-center gap-2 mb-6 text-muted-foreground text-sm">
-              <Shield className="w-4 h-4" />
-              <span>Security Intelligence</span>
+            <div className="fade-in flex items-center gap-2 mb-6 text-muted-foreground text-sm font-medium tracking-wide">
+              <img src="/favicon.png" alt="" className="w-5 h-5 object-contain" />
+              <span>SECURITY INTELLIGENCE</span>
             </div>
+
 
             {/* Main headline */}
             <h1 className="fade-in fade-in-delay-1 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 leading-[1.1]">

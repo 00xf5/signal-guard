@@ -7,9 +7,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
             <a href="/" className="flex items-center gap-2 font-semibold mb-3">
-              <Shield className="w-5 h-5" />
+              <img src="/favicon.png" alt="RiskSignal" className="w-6 h-6 object-contain" />
               <span>RiskSignal</span>
             </a>
+
             <p className="text-sm text-muted-foreground max-w-xs">
               Security intelligence for risk scoring and anonymity detection.
             </p>

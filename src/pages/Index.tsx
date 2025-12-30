@@ -6,7 +6,9 @@ import Features from "@/components/Features";
 import Scoring from "@/components/Scoring";
 import DataSources from "@/components/DataSources";
 import Philosophy from "@/components/Philosophy";
+import SEOContent from "@/components/SEOContent";
 import Footer from "@/components/Footer";
+
 
 const Index = () => {
   const { theme } = useTheme();
@@ -22,8 +24,10 @@ const Index = () => {
           <Scoring />
           <DataSources />
           <Philosophy />
+          <SEOContent />
         </main>
         <Footer />
+
       </div>
     </ThemeProvider>
   );
