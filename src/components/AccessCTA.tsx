@@ -11,9 +11,14 @@ const AccessCTA = () => {
                 <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <div className="text-center md:text-left">
-                            <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                                API Access
-                            </h3>
+                            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                                    API Access
+                                </h3>
+                                <span className="px-2 py-0.5 rounded-full bg-success/10 border border-success/20 text-[10px] font-bold text-success uppercase tracking-wider">
+                                    500 free checks
+                                </span>
+                            </div>
                             <p className="text-sm text-muted-foreground mt-1 max-w-md">
                                 Integrate our IP intelligence into your application.
                             </p>

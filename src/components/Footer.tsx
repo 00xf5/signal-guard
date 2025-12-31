@@ -18,6 +18,14 @@ const Footer = () => {
 
           <div className="flex flex-wrap gap-8 text-sm">
             <div>
+              <h4 className="font-semibold mb-3">Platform</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li><Link to="/about" className="hover:text-foreground transition-colors">About</Link></li>
+                <li><Link to="/docs" className="hover:text-foreground transition-colors">Documentation</Link></li>
+                <li><Link to="/api-access" className="hover:text-foreground transition-colors">API Keys</Link></li>
+              </ul>
+            </div>
+            <div>
               <h4 className="font-semibold mb-3">Legal</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>

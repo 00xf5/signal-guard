@@ -88,7 +88,7 @@ func main() {
                     Back to Generator
                 </Link>
 
-                <div className="grid lg:grid-cols-[1fr_380px] gap-12 lg:gap-20">
+                <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-12 lg:gap-20">
                     <div className="space-y-12">
                         <div className="space-y-4">
                             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
