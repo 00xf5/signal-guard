@@ -101,6 +101,11 @@ export default async function handler(req, res) {
                     latitude: data.latitude,
                     longitude: data.longitude,
                     timezone: data.timezone?.id,
+                    accuracy: {
+                        radius_km: 50,
+                        confidence: isInfra ? "HIGH" : "MEDIUM",
+                        precision_note: isInfra ? "DataCenter Exchange Point" : "Estimated via ISP Backhaul/Exchange"
+                    },
                     currency: {
                         name: data.currency?.name,
                         code: data.currency?.code,
