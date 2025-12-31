@@ -58,6 +58,26 @@ def scan_ip(ip, api_key):
 data = scan_ip("8.8.8.8", "YOUR_24_DIGIT_KEY")
 print(data)`;
 
+    const goCode = `package main
+
+import (
+    "fmt"
+    "net/http"
+    "io/ioutil"
+)
+
+func main() {
+    client := &http.Client{}
+    req, _ := http.NewRequest("GET", "https://risksignal-tau.vercel.app/api/scan?ip=8.8.8.8", nil)
+    req.Header.Set("x-api-key", "YOUR_24_DIGIT_KEY")
+    
+    resp, _ := client.Do(req)
+    defer resp.Body.Close()
+    
+    body, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println(string(body))
+}`;
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Header />
@@ -138,6 +158,14 @@ print(data)`;
                                     </h3>
                                     <CodeBlock code={pythonCode} language="python" id="python" />
                                 </div>
+
+                                <div className="space-y-2">
+                                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                                        <Terminal className="w-4 h-4 text-muted-foreground" />
+                                        Go (Standard Library)
+                                    </h3>
+                                    <CodeBlock code={goCode} language="go" id="go" />
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -148,27 +176,34 @@ print(data)`;
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-mono text-success">risk_score</span>
-                                        <span className="text-[10px] text-muted-foreground uppercase">Float</span>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="font-mono text-success">security.risk_score</span>
+                                        <span className="text-muted-foreground uppercase text-[9px]">Float (0-100)</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">0-100 probability that the IP is used for malicious activities.</p>
+                                    <p className="text-xs text-muted-foreground">Weighted probability that the IP is used for malicious activities.</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-mono text-success">is_vpn</span>
-                                        <span className="text-[10px] text-muted-foreground uppercase">Boolean</span>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="font-mono text-info">security.verdict</span>
+                                        <span className="text-muted-foreground uppercase text-[9px]">String</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">Detected VPN tunnel from our infrastructure reputation layer.</p>
+                                    <p className="text-xs text-muted-foreground">Strategic recommendation: ALLOW, REVIEW, or BLOCK.</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-mono text-success">is_bot</span>
-                                        <span className="text-[10px] text-muted-foreground uppercase">Boolean</span>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="font-mono text-warning">security.trust_level</span>
+                                        <span className="text-muted-foreground uppercase text-[9px]">String</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">High-confidence automation signal (headless browsers, scraping agents).</p>
+                                    <p className="text-xs text-muted-foreground">Confidence tier: PREMIUM, NEUTRAL, or HIGH_RISK.</p>
+                                </div>
+
+                                <div className="space-y-2 text-xs">
+                                    <span className="font-mono text-white/40 block mb-1 uppercase text-[10px]">Reputation Markers</span>
+                                    <p className="text-[10px] text-muted-foreground italic">
+                                        is_vpn, is_proxy, is_tor, is_botnet_node, is_spam_source
+                                    </p>
                                 </div>
                             </div>
 

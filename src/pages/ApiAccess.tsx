@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
-import { Key, Copy, Check, Zap, ArrowLeft, ShieldCheck, Mail } from "lucide-react";
+import { Key, Copy, Check, Zap, ArrowLeft, ShieldCheck, Mail, Code2, Terminal, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ const ApiAccess = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState<string | null>(null);
     const [isCopied, setIsCopied] = useState(false);
+    const [previewLang, setPreviewLang] = useState('javascript');
 
     const generateApiKey = () => {
         const buffer = new Uint8Array(12);
@@ -170,7 +171,113 @@ const ApiAccess = () => {
                         </div>
                     )}
 
-                    <div className="grid sm:grid-cols-3 gap-6 pt-8">
+                    <div className="space-y-6 pt-12">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center border border-info/20">
+                                <Code2 className="w-4 h-4 text-info" />
+                            </div>
+                            <h2 className="text-xl font-bold">API Intelligence Preview</h2>
+                        </div>
+
+                        <div className="grid lg:grid-cols-2 gap-4">
+                            {/* Request Column */}
+                            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
+                                <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+                                    <div className="flex gap-4">
+                                        {['javascript', 'python', 'go'].map((lang) => (
+                                            <button
+                                                key={lang}
+                                                onClick={() => setPreviewLang(lang)}
+                                                className={`text-[10px] uppercase tracking-tighter font-bold transition-colors ${previewLang === lang ? 'text-success' : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                            >
+                                                {lang}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <Terminal className="w-3.5 h-3.5 text-muted-foreground/30" />
+                                </div>
+                                <div className="p-5 flex-1 font-mono text-xs sm:text-[13px] leading-relaxed text-foreground/80">
+                                    {previewLang === 'javascript' && (
+                                        <pre className="text-info/90">
+                                            {`// GET /api/scan?ip=73.124.52.11
+const res = await fetch(url, {
+  headers: { 
+    'x-api-key': '0c3b8ed...' 
+  }
+});
+const data = await res.json();`}
+                                        </pre>
+                                    )}
+                                    {previewLang === 'python' && (
+                                        <pre className="text-warning/80">
+                                            {`# GET /api/scan?ip=73.124.52.11
+headers = {'x-api-key': '0c3b8ed...'}
+res = requests.get(url, headers=headers)
+data = res.json()`}
+                                        </pre>
+                                    )}
+                                    {previewLang === 'go' && (
+                                        <pre className="text-success/80">
+                                            {`// GET /api/scan?ip=73.124.52.11
+req, _ := http.NewRequest("GET", url, nil)
+req.Header.Set("x-api-key", "0c3b8ed...")
+resp, _ := client.Do(req)`}
+                                        </pre>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Response Column */}
+                            <div className="bg-black/60 border border-white/10 rounded-2xl overflow-hidden flex flex-col group/resp">
+                                <div className="flex items-center justify-between px-4 py-3 bg-success/5 border-b border-white/5">
+                                    <span className="text-[10px] uppercase tracking-tighter text-success font-bold flex items-center gap-1.5">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                                        Sample Signal Response (USA residential)
+                                    </span>
+                                    <Database className="w-3.5 h-3.5 text-success/30" />
+                                </div>
+                                <div className="p-5 max-h-[280px] overflow-y-auto font-mono text-[11px] sm:text-xs leading-tight scrollbar-hide bg-black/20">
+                                    <pre className="text-success/70">
+                                        {`{
+  "status": "success",
+  "data": {
+    "ip": "73.124.52.11",
+    "security": {
+      "risk_score": 0,
+      "trust_level": "PREMIUM",
+      "verdict": "ALLOW",
+      "mitigation": "NONE",
+      "signals": ["RESIDENTIAL_IP"]
+    },
+    "connection": {
+      "isp": "Comcast Cable",
+      "asn": "AS7922",
+      "type": "Residential",
+      "is_mobile": false
+    },
+    "geographic": {
+      "country": "United States",
+      "flag": "🇺🇸",
+      "city": "Philadelphia",
+      "accuracy": { 
+        "radius_km": 10, 
+        "confidence": "HIGH" 
+      }
+    },
+    "reputation": {
+      "is_known_attacker": false,
+      "provider_reputation": "HIGH"
+    }
+  }
+}`}
+                                    </pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-6 pt-12 border-t border-white/5">
                         <div className="space-y-2">
                             <h4 className="font-bold text-sm uppercase tracking-widest text-muted-foreground">High Speed</h4>
                             <p className="text-xs text-muted-foreground">Global edge nodes ensure &lt;50ms response times for all key-based scans.</p>
