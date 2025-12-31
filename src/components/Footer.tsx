@@ -1,4 +1,4 @@
-import { Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -6,10 +6,10 @@ const Footer = () => {
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div>
-            <a href="/" className="flex items-center gap-2 font-semibold mb-3">
+            <Link to="/" className="flex items-center gap-2 font-semibold mb-3">
               <img src="/favicon.png" alt="RiskSignal" className="w-6 h-6 object-contain" />
               <span>RiskSignal</span>
-            </a>
+            </Link>
 
             <p className="text-sm text-muted-foreground max-w-xs">
               Security intelligence for risk scoring and anonymity detection.
@@ -20,8 +20,8 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-3">Legal</h4>
               <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
+                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>
