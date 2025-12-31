@@ -3,9 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 export default async function handler(req, res) {
+    // 0. Safety Check for Env Vars
+    if (!supabaseUrl || !supabaseAnonKey) {
+        return res.status(500).json({
+            error: 'Server configuration error: Missing Supabase keys in Vercel Dashboard.'
+        });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     // 1. Method Check
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
