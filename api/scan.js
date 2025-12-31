@@ -68,10 +68,15 @@ export default async function handler(req, res) {
         if (isHosting && !isVPN) riskScore += 15;
 
         // 6. Update Quota
-        await supabase
+        const { error: updateError } = await supabase
             .from('api_access')
             .update({ usage_count: accessData.usage_count + 1 })
             .eq('id', accessData.id);
+
+        if (updateError) {
+            console.error("Quota update failed:", updateError);
+            throw new Error(`Usage sync failed: ${updateError.message}`);
+        }
 
         // 7. Return Response
         return res.status(200).json({
