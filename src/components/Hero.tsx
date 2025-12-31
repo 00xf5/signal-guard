@@ -1,5 +1,5 @@
 import { Shield } from "lucide-react";
-import IPLookupDemo from "./IPLookupDemo";
+import IPScanner from "./IPScanner";
 
 const Hero = () => {
   return (
@@ -55,7 +55,7 @@ const Hero = () => {
 
           {/* Right Column - Live Demo */}
           <div className="order-2 fade-in fade-in-delay-2">
-            <IPLookupDemo />
+            <IPScanner />
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -48,146 +48,34 @@ interface IPData {
     threatLevel: "low" | "medium" | "high" | "critical";
     lastSeen: string;
     usageType: string;
+    webrtcLeakedIp?: string;
+    langMismatch: boolean;
+    tzMismatch: boolean;
 }
 
-const mockIPDatabase: Record<string, IPData> = {
-    "8.8.8.8": {
-        ip: "8.8.8.8",
-        country: "United States",
-        countryCode: "US",
-        city: "Mountain View",
-        region: "California",
-        timezone: "America/Los_Angeles",
-        isp: "Google LLC",
-        org: "Google Public DNS",
-        asn: "AS15169",
-        riskScore: 12.4,
-        anonymityScore: 5.2,
-        fraudScore: 8.1,
-        abuseScore: 3.2,
-        isVPN: false,
-        isProxy: false,
-        isTor: false,
-        isBot: false,
-        isHosting: true,
-        isResidential: false,
-        responseTime: 23,
-        connectionType: "Corporate",
-        threatLevel: "low",
-        lastSeen: "2 minutes ago",
-        usageType: "Content Delivery Network",
-    },
-    "1.1.1.1": {
-        ip: "1.1.1.1",
-        country: "Australia",
-        countryCode: "AU",
-        city: "Sydney",
-        region: "New South Wales",
-        timezone: "Australia/Sydney",
-        isp: "Cloudflare, Inc.",
-        org: "APNIC and Cloudflare DNS",
-        asn: "AS13335",
-        riskScore: 8.7,
-        anonymityScore: 3.7,
-        fraudScore: 5.4,
-        abuseScore: 2.1,
-        isVPN: false,
-        isProxy: false,
-        isTor: false,
-        isBot: false,
-        isHosting: true,
-        isResidential: false,
-        responseTime: 31,
-        connectionType: "Corporate",
-        threatLevel: "low",
-        lastSeen: "Just now",
-        usageType: "DNS Resolver",
-    },
-    "185.220.101.1": {
-        ip: "185.220.101.1",
-        country: "Germany",
-        countryCode: "DE",
-        city: "Frankfurt",
-        region: "Hesse",
-        timezone: "Europe/Berlin",
-        isp: "Tor Exit Node",
-        org: "Tor Project",
-        asn: "AS205100",
-        riskScore: 94.2,
-        anonymityScore: 98.6,
-        fraudScore: 87.3,
-        abuseScore: 91.5,
-        isVPN: false,
-        isProxy: false,
-        isTor: true,
-        isBot: false,
-        isHosting: true,
-        isResidential: false,
-        responseTime: 67,
-        connectionType: "Anonymizer",
-        threatLevel: "critical",
-        lastSeen: "Active now",
-        usageType: "Tor Exit Node",
-    },
-};
-
-const generateRandomIP = (): IPData => {
-    const isHighRisk = Math.random() > 0.6;
-    const riskScore = isHighRisk ? Math.random() * 40 + 55 : Math.random() * 35 + 5;
-    const anonymityScore = isHighRisk ? Math.random() * 50 + 45 : Math.random() * 30 + 2;
-    const fraudScore = isHighRisk ? Math.random() * 45 + 40 : Math.random() * 25 + 5;
-    const abuseScore = isHighRisk ? Math.random() * 50 + 30 : Math.random() * 20 + 2;
-
-    const countries = [
-        { name: "United States", code: "US", city: "New York", region: "New York", tz: "America/New_York" },
-        { name: "United Kingdom", code: "GB", city: "London", region: "England", tz: "Europe/London" },
-        { name: "Germany", code: "DE", city: "Berlin", region: "Berlin", tz: "Europe/Berlin" },
-        { name: "Japan", code: "JP", city: "Tokyo", region: "Tokyo", tz: "Asia/Tokyo" },
-        { name: "Canada", code: "CA", city: "Toronto", region: "Ontario", tz: "America/Toronto" },
-        { name: "France", code: "FR", city: "Paris", region: "Île-de-France", tz: "Europe/Paris" },
-        { name: "Netherlands", code: "NL", city: "Amsterdam", region: "North Holland", tz: "Europe/Amsterdam" },
-        { name: "Singapore", code: "SG", city: "Singapore", region: "Central", tz: "Asia/Singapore" },
-    ];
-
-    const isps = ["Comcast", "AT&T", "Verizon", "Deutsche Telekom", "BT Group", "NTT", "Orange SA", "Vodafone"];
-    const usageTypes = ["ISP", "Business", "Education", "Government", "Military", "Data Center"];
-    const connectionTypes = ["Residential", "Corporate", "Mobile", "Satellite"];
-    const randomCountry = countries[Math.floor(Math.random() * countries.length)];
-    const randomIsp = isps[Math.floor(Math.random() * isps.length)];
-
-    const getThreatLevel = (risk: number): "low" | "medium" | "high" | "critical" => {
-        if (risk < 25) return "low";
-        if (risk < 50) return "medium";
-        if (risk < 75) return "high";
-        return "critical";
-    };
-
-    return {
-        ip: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-        country: randomCountry.name,
-        countryCode: randomCountry.code,
-        city: randomCountry.city,
-        region: randomCountry.region,
-        timezone: randomCountry.tz,
-        isp: randomIsp,
-        org: `${randomIsp} Services`,
-        asn: `AS${Math.floor(Math.random() * 50000) + 1000}`,
-        riskScore: parseFloat(riskScore.toFixed(1)),
-        anonymityScore: parseFloat(anonymityScore.toFixed(1)),
-        fraudScore: parseFloat(fraudScore.toFixed(1)),
-        abuseScore: parseFloat(abuseScore.toFixed(1)),
-        isVPN: isHighRisk && Math.random() > 0.5,
-        isProxy: isHighRisk && Math.random() > 0.7,
-        isTor: isHighRisk && Math.random() > 0.85,
-        isBot: Math.random() > 0.9,
-        isHosting: Math.random() > 0.7,
-        isResidential: !isHighRisk && Math.random() > 0.4,
-        responseTime: Math.floor(Math.random() * 50) + 15,
-        connectionType: connectionTypes[Math.floor(Math.random() * connectionTypes.length)],
-        threatLevel: getThreatLevel(riskScore),
-        lastSeen: ["Just now", "2 minutes ago", "5 minutes ago", "1 hour ago"][Math.floor(Math.random() * 4)],
-        usageType: usageTypes[Math.floor(Math.random() * usageTypes.length)],
-    };
+// Helper to get local IP via WebRTC
+const getWebRTCIP = (): Promise<string | null> => {
+    return new Promise((resolve) => {
+        try {
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            pc.createDataChannel("");
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+            pc.onicecandidate = (ice) => {
+                if (!ice || !ice.candidate || !ice.candidate.candidate) {
+                    resolve(null);
+                    return;
+                }
+                const myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)?.[1];
+                if (myIP) {
+                    pc.onicecandidate = null;
+                    resolve(myIP);
+                }
+            };
+            setTimeout(() => resolve(null), 1000);
+        } catch (e) {
+            resolve(null);
+        }
+    });
 };
 
 // Animated circular gauge component
@@ -221,13 +109,10 @@ const CircularGauge = ({
         const duration = 1500;
         const steps = 80;
         const valueIncrement = value / steps;
-        const strokeIncrement = (circumference * (1 - value / maxValue)) / steps;
         let current = 0;
-        let currentStroke = circumference;
 
         const timer = setInterval(() => {
             current += valueIncrement;
-            currentStroke -= (circumference - circumference * (1 - value / maxValue)) / steps;
 
             if (current >= value) {
                 setDisplayValue(value);
@@ -252,7 +137,6 @@ const CircularGauge = ({
     return (
         <div className="relative flex flex-col items-center">
             <div className="relative" style={{ width: size, height: size }}>
-                {/* Background circle */}
                 <svg className="absolute inset-0 -rotate-90" width={size} height={size}>
                     <circle
                         cx={size / 2}
@@ -262,7 +146,6 @@ const CircularGauge = ({
                         stroke="hsl(var(--secondary))"
                         strokeWidth={strokeWidth}
                     />
-                    {/* Animated progress circle */}
                     <circle
                         cx={size / 2}
                         cy={size / 2}
@@ -279,7 +162,6 @@ const CircularGauge = ({
                         }}
                     />
                 </svg>
-                {/* Center content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                     {Icon && <Icon className={`w-4 h-4 mb-1 ${colorClass}`} />}
                     <span className={`text-lg font-bold tabular-nums ${colorClass}`}>
@@ -292,7 +174,7 @@ const CircularGauge = ({
     );
 };
 
-// Animated horizontal bar with glow effect
+// Animated horizontal bar
 const AnimatedBar = ({
     value,
     label,
@@ -353,7 +235,6 @@ const AnimatedBar = ({
                 </span>
             </div>
             <div className="h-2 bg-secondary overflow-hidden relative">
-                {/* Glow effect */}
                 <div
                     className="absolute inset-0 blur-sm transition-all duration-75"
                     style={{
@@ -361,12 +242,10 @@ const AnimatedBar = ({
                         background: getGlowColor(),
                     }}
                 />
-                {/* Main bar */}
                 <div
                     className={`h-full relative transition-all duration-75 ease-out ${colorClass.replace('text-', 'bg-')}`}
                     style={{ width: `${Math.min(barWidth, 100)}%` }}
                 >
-                    {/* Shimmer effect */}
                     <div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"
                         style={{ animationDuration: '2s' }}
@@ -377,7 +256,6 @@ const AnimatedBar = ({
     );
 };
 
-// Pulsing indicator dot
 const PulsingDot = ({ color, size = "w-2 h-2" }: { color: string; size?: string }) => (
     <span className="relative flex">
         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${color}`} />
@@ -385,7 +263,6 @@ const PulsingDot = ({ color, size = "w-2 h-2" }: { color: string; size?: string 
     </span>
 );
 
-// Data row component
 const DataRow = ({
     icon: Icon,
     label,
@@ -419,56 +296,138 @@ const DataRow = ({
     );
 };
 
-const IPLookupDemo = () => {
+declare global {
+    interface Window {
+        turnstile: {
+            render: (container: string | HTMLElement, options: any) => string;
+            execute: (container: string | HTMLElement, options: any) => void;
+            reset: (widgetId: string) => void;
+            getResponse: (widgetId: string) => string | undefined;
+        };
+    }
+}
+
+const IPScanner = () => {
     const [ipInput, setIpInput] = useState("");
     const [ipData, setIpData] = useState<IPData | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [key, setKey] = useState(0);
     const [scanPhase, setScanPhase] = useState(0);
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+    const [isVerifyingHuman, setIsVerifyingHuman] = useState(false);
+    const turnstileWidgetId = useRef<string | null>(null);
 
     const lookupIP = useCallback(async (ip?: string) => {
         setIsLoading(true);
         setIpData(null);
         setScanPhase(0);
+        setIsVerifyingHuman(true);
 
-        // Simulate scanning phases
         const phases = [1, 2, 3, 4];
         phases.forEach((phase, i) => {
             setTimeout(() => setScanPhase(phase), i * 250);
         });
 
+        // Trigger Turnstile reset
+        if (window.turnstile && turnstileWidgetId.current) {
+            try {
+                window.turnstile.reset(turnstileWidgetId.current);
+            } catch (e) {
+                console.warn("Turnstile reset failed:", e);
+            }
+        }
+
         try {
             const targetIp = ip || ipInput.trim() || "";
-            // Use ipwho.is - it supports HTTPS for free and provides security flags (vpn, proxy, tor, hosting)
             const response = await fetch(`https://ipwho.is/${targetIp}?t=${Date.now()}`);
             const data = await response.json();
 
             if (data.success === false) throw new Error(data.message || "Invalid IP");
 
-            // --- REAL DETECTION LOGIC ---
+            // Capture Turnstile response
+            let token = null;
+            if (window.turnstile && turnstileWidgetId.current) {
+                try {
+                    token = window.turnstile.getResponse(turnstileWidgetId.current);
+                } catch (e) {
+                    console.warn("Could not get Turnstile response:", e);
+                }
+            }
+            setTurnstileToken(token || null);
+            setIsVerifyingHuman(false);
 
-            const isVPN = data.security?.vpn === true;
+            // --- ADVANCED DETECTION LOGIC ---
+
+            // 0. Provider Reputation Intelligence (Override for false negatives)
+            const INFRASTRUCTURE_ASNS = ["212238", "13335", "15169", "54113", "16509", "14061", "16276", "24940"];
+            const INFRASTRUCTURE_ISPS = ["datacamp", "m247", "akamai", "cloudflare", "digitalocean", "linode", "ovh", "hetzner", "google cloud", "amazon technologies", "microsoft azure"];
+
+            const rawAsn = data.connection?.asn ? String(data.connection.asn) : "";
+            const rawIsp = data.connection?.isp?.toLowerCase() || "";
+
+            const isKnownInfra = INFRASTRUCTURE_ASNS.includes(rawAsn) ||
+                INFRASTRUCTURE_ISPS.some(infra => rawIsp.includes(infra));
+
+            // Force flags if known infra but API says residential
+            const isVPN = data.security?.vpn === true || (isKnownInfra && !rawIsp.includes("consumer"));
             const isProxy = data.security?.proxy === true || data.security?.relay === true;
             const isTor = data.security?.tor === true;
-            const isHosting = data.security?.hosting === true;
+            const isHosting = data.security?.hosting === true || (isKnownInfra && !isVPN);
 
-            // Timezone Mismatch Detection (The "Gotcha" for most VPN users)
+            // 1. WebRTC Leak Check
+            const webrtcIp = await getWebRTCIP();
+            const webrtcLeaked = webrtcIp && webrtcIp !== data.ip;
+
+            // 2. Timezone Mismatch
             const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const ipTimezone = data.timezone?.id;
             const tzMismatch = ipTimezone && browserTimezone !== ipTimezone;
 
-            // Calculate scores based on the real signals provided by ipwho.is
-            let riskScore = 5.0;
-            if (isTor) riskScore += 85;
-            else if (isVPN || isProxy) riskScore += 45;
-            if (isHosting && !isVPN) riskScore += 15;
-            if (tzMismatch) riskScore += 12;
+            // 3. Language Inconsistency
+            const browserLangs = navigator.languages || [navigator.language];
+            const countryCode = data.country_code?.toLowerCase();
+            const langMismatch = !browserLangs.some(lang => lang.toLowerCase().includes(countryCode));
 
+            // 4. Automation Check
+            const isAutomation = navigator.webdriver === true;
+
+            // --- REFINED WEIGHTED SCORING ---
+
+            // Risk Score
+            let riskScore = 5.0;
+            if (isTor) riskScore += 80;
+            else if (isVPN || isProxy) riskScore += 45; // Increased weight
+            if (isKnownInfra && !data.security?.vpn) riskScore += 20; // Reputation penalty
+            if (webrtcLeaked) riskScore += 25; // Massive signal
+            if (tzMismatch) riskScore += 12;
+            if (langMismatch) riskScore += 8;
+            if (isAutomation) riskScore += 30;
+            if (isHosting && !isVPN) riskScore += 15;
+
+            // Anonymity Score
             let anonymityScore = 5.0;
             if (isTor) anonymityScore += 90;
-            if (isVPN || isProxy) anonymityScore += 65;
-            if (tzMismatch) anonymityScore += 25;
+            else if (isVPN || isProxy) anonymityScore += 65;
+            if (isKnownInfra) anonymityScore += 15;
+            if (tzMismatch) anonymityScore += 20;
+            if (webrtcLeaked) anonymityScore += 15;
             if (isHosting) anonymityScore += 10;
+
+            // Fraud Score
+            let fraudScore = 5.0;
+            if (isTor) fraudScore += 85;
+            if (isVPN || (isKnownInfra && !rawIsp.includes("consumer"))) fraudScore += 40;
+            if (isAutomation) fraudScore += 60;
+            if (isHosting) fraudScore += 30;
+            if (tzMismatch && (isVPN || isProxy)) fraudScore += 25;
+            if (!token) fraudScore += 5; // Penalty for missing validation (bot signal)
+
+            // Abuse Score
+            let abuseScore = 5.0;
+            if (isTor) abuseScore += 75;
+            if (isHosting || isKnownInfra) abuseScore += 45;
+            if (isAutomation) abuseScore += 55;
+            if (isProxy) abuseScore += 25;
 
             const getThreatLevel = (risk: number): "low" | "medium" | "high" | "critical" => {
                 if (risk < 20) return "low";
@@ -489,27 +448,27 @@ const IPLookupDemo = () => {
                 asn: data.connection?.asn ? `AS${data.connection.asn}` : 'N/A',
                 riskScore: Math.min(parseFloat(riskScore.toFixed(1)), 100),
                 anonymityScore: Math.min(parseFloat(anonymityScore.toFixed(1)), 100),
-                fraudScore: isVPN ? 58.4 : (isTor ? 92.1 : 8.1),
-                abuseScore: isHosting ? 34.2 : 3.2,
+                fraudScore: Math.min(parseFloat(fraudScore.toFixed(1)), 100),
+                abuseScore: Math.min(parseFloat(abuseScore.toFixed(1)), 100),
                 isVPN: isVPN,
                 isProxy: isProxy,
                 isTor: isTor,
-                isBot: isHosting && (isVPN || isProxy),
+                isBot: isAutomation || (isHosting && (isVPN || isProxy)),
                 isHosting: isHosting,
-                isResidential: !isHosting && !isVPN && !isProxy,
+                isResidential: !isKnownInfra && !isHosting && !isVPN && !isProxy && !isTor,
                 responseTime: Math.floor(Math.random() * 40) + 10,
-                connectionType: isHosting ? "Data Center" : "Residential",
+                connectionType: isHosting || isKnownInfra ? "Infrastructure" : "Residential",
                 threatLevel: getThreatLevel(riskScore),
                 lastSeen: "Just now",
-                usageType: isHosting ? "Cloud Provider" : "Consumer",
+                usageType: isVPN ? "VPN Tunnel" : (isHosting ? "Cloud/Server" : "Consumer"),
+                webrtcLeakedIp: webrtcIp || undefined,
+                langMismatch,
+                tzMismatch: !!tzMismatch
             });
             setKey(prev => prev + 1);
         } catch (err) {
             console.error("Lookup failed:", err);
-            // Fallback to mock if API fails
-            const fallbackData = generateRandomIP();
-            if (ipInput.trim()) fallbackData.ip = ipInput.trim();
-            setIpData(fallbackData);
+            setIsVerifyingHuman(false);
         } finally {
             setIsLoading(false);
             setScanPhase(0);
@@ -517,10 +476,25 @@ const IPLookupDemo = () => {
     }, [ipInput]);
 
     useEffect(() => {
-        // Empty string fetches visitor's own IP
         lookupIP("");
-    }, []);
 
+        // Initialize Invisible Turnstile
+        const timer = setInterval(() => {
+            if (window.turnstile) {
+                const id = window.turnstile.render("#turnstile-widget", {
+                    sitekey: import.meta.env.VITE_CLOUDFLARE_SITE_KEY || "0x4AAAAAACJ26VWrag00nsSV",
+                    callback: (token: string) => setTurnstileToken(token),
+                    "expired-callback": () => setTurnstileToken(null),
+                    "error-callback": () => setTurnstileToken(null),
+                    size: "invisible",
+                });
+                turnstileWidgetId.current = id;
+                clearInterval(timer);
+            }
+        }, 500);
+
+        return () => clearInterval(timer);
+    }, []);
 
     const getRiskColor = (score: number) => {
         if (score < 30) return "text-success";
@@ -547,22 +521,23 @@ const IPLookupDemo = () => {
 
     return (
         <div className="w-full">
-            {/* Terminal Header */}
+            {/* Hidden Cloudflare Bridge */}
+            <div id="turnstile-widget" style={{ display: 'none' }}></div>
+
             <div className="border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card/80">
                     <span className="w-3 h-3 rounded-full bg-danger/60 hover:bg-danger transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-warning/60 hover:bg-warning transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-success/60 hover:bg-success transition-colors cursor-pointer" />
-                    <span className="ml-2 text-sm text-muted-foreground font-medium">risksignal — threat intelligence</span>
+                    <span className="ml-2 text-sm text-muted-foreground font-medium">risksignal — active scanner</span>
                     <div className="ml-auto flex items-center gap-2">
                         <PulsingDot color="bg-success" />
                         <span className="text-xs text-success font-semibold tracking-wide">LIVE</span>
                     </div>
                 </div>
 
-                {/* Results Area */}
                 <div className="p-4 space-y-4 min-h-[420px]">
-                    {isLoading ? (
+                    {isLoading || isVerifyingHuman ? (
                         <div className="flex flex-col items-center justify-center h-[380px] gap-4">
                             <div className="relative">
                                 <div className="w-16 h-16 border-2 border-muted rounded-full" />
@@ -570,21 +545,22 @@ const IPLookupDemo = () => {
                                 <Fingerprint className="absolute inset-0 m-auto w-6 h-6 text-muted-foreground animate-pulse" />
                             </div>
                             <div className="text-center">
-                                <div className="text-sm font-medium mb-2">Analyzing IP Address</div>
+                                <div className="text-sm font-medium mb-2">
+                                    {isVerifyingHuman ? "Validating Session Integrity" : "Analyzing IP Intelligence"}
+                                </div>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className={scanPhase >= 1 ? "text-success" : ""}>Geolocation</span>
+                                    <span className={scanPhase >= 1 ? "text-success" : ""}>Geo-Crosscheck</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 2 ? "text-success" : ""}>Threat Intel</span>
+                                    <span className={scanPhase >= 2 ? "text-success" : ""}>Browser Leak Check</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 3 ? "text-success" : ""}>Anonymity</span>
+                                    <span className={scanPhase >= 3 ? "text-success" : ""}>Human Verification</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 4 ? "text-success" : ""}>Report</span>
+                                    <span className={scanPhase >= 4 ? "text-success" : ""}>Final Report</span>
                                 </div>
                             </div>
                         </div>
                     ) : ipData ? (
                         <div key={key} className="space-y-4">
-                            {/* IP Header with Threat Level */}
                             <div className="flex items-start justify-between border-b border-border pb-3">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
@@ -615,7 +591,6 @@ const IPLookupDemo = () => {
                                 </div>
                             </div>
 
-                            {/* Main Gauges - Risk & Anonymity */}
                             <div className="grid grid-cols-4 gap-2 py-2">
                                 <CircularGauge
                                     value={ipData.riskScore}
@@ -651,99 +626,99 @@ const IPLookupDemo = () => {
                                 />
                             </div>
 
-                            {/* Additional Score Bars */}
                             <div className="grid grid-cols-2 gap-3 pt-1">
                                 <AnimatedBar
                                     value={ipData.riskScore}
-                                    label="Threat Level"
+                                    label="Signal Confidence"
                                     colorClass={getRiskColor(ipData.riskScore)}
                                     delay={100}
                                 />
                                 <AnimatedBar
                                     value={ipData.anonymityScore}
-                                    label="Privacy Score"
+                                    label="Detection Level"
                                     colorClass={getRiskColor(ipData.anonymityScore)}
                                     delay={200}
                                 />
                             </div>
 
-                            {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-2 border-y border-border">
-                                <DataRow icon={Server} label="ISP" value={ipData.isp} delay={100} />
-                                <DataRow icon={Network} label="ASN" value={ipData.asn} delay={150} />
-                                <DataRow icon={Cpu} label="Org" value={ipData.org} delay={200} />
-                                <DataRow icon={Radio} label="Type" value={ipData.connectionType} delay={250} />
-                                <DataRow icon={Database} label="Usage" value={ipData.usageType} delay={300} />
-                                <DataRow icon={Clock} label="Timezone" value={ipData.timezone?.includes('/') ? ipData.timezone.split('/')[1] : ipData.timezone || 'N/A'} delay={350} />
+                                <DataRow icon={Server} label="Provider" value={ipData.isp} delay={100} />
+                                <DataRow icon={Network} label="Route" value={ipData.asn} delay={150} />
+                                <DataRow icon={Cpu} label="System" value={ipData.org} delay={200} />
+                                <DataRow icon={Radio} label="Protocol" value={ipData.connectionType} delay={250} />
+                                <DataRow icon={Database} label="Node Type" value={ipData.usageType} delay={300} />
+                                <DataRow icon={Clock} label="Zone" value={ipData.timezone?.includes('/') ? ipData.timezone.split('/')[1] : ipData.timezone || 'N/A'} delay={350} />
 
                             </div>
 
-                            {/* Detection Indicators */}
                             <div className="space-y-2">
                                 <div className="text-xs text-muted-foreground font-medium flex items-center gap-2">
                                     <Fingerprint className="w-3 h-3" />
-                                    Detection Flags
+                                    Active Telemetry Flags
                                 </div>
                                 <div className="flex flex-wrap gap-1.5">
-                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isVPN ? 'bg-warning/20 text-warning border-warning/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
+                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isVPN ? 'bg-danger/20 text-danger border-danger/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
                                         {ipData.isVPN ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                                        VPN
+                                        VPN/TUNNEL
                                     </span>
-                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isProxy ? 'bg-warning/20 text-warning border-warning/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
+                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.tzMismatch ? 'bg-warning/20 text-warning border-warning/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
-                                        <Server className="w-3 h-3" />
-                                        Proxy
+                                        <Clock className="w-3 h-3" />
+                                        TZ-LEECH
                                     </span>
-                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isTor ? 'bg-danger/20 text-danger border-danger/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
+                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.webrtcLeakedIp ? 'bg-danger/20 text-danger border-danger/30 scale-105 animate-pulse' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
-                                        <Globe className="w-3 h-3" />
-                                        Tor
+                                        <Wifi className="w-3 h-3" />
+                                        RTC-LEAK
                                     </span>
                                     <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isBot ? 'bg-danger/20 text-danger border-danger/30 scale-105' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
                                         <Cpu className="w-3 h-3" />
-                                        Bot
+                                        AUTOMATION
                                     </span>
-                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isHosting ? 'bg-info/20 text-info border-info/30' : 'bg-secondary/50 text-muted-foreground border-border'
+                                    <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.langMismatch ? 'bg-warning/20 text-warning border-warning/30' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
-                                        <Database className="w-3 h-3" />
-                                        Hosting
+                                        <Globe className="w-3 h-3" />
+                                        LOCALE-GAP
                                     </span>
                                     <span className={`flex items-center gap-1 text-[10px] px-2 py-1 border font-medium transition-all ${ipData.isResidential ? 'bg-success/20 text-success border-success/30' : 'bg-secondary/50 text-muted-foreground border-border'
                                         }`}>
                                         <TrendingUp className="w-3 h-3" />
-                                        Residential
+                                        RESIDENTIAL
                                     </span>
                                 </div>
                             </div>
 
-                            {/* Status Line */}
                             <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1">
                                 <span className="flex items-center gap-1">
                                     <Zap className="w-3 h-3 text-success" />
-                                    Analysis complete
+                                    Encryption verified
+                                    {turnstileToken && <Lock className="w-2.5 h-2.5 text-success animate-pulse" />}
                                 </span>
-                                <span>Powered by 5+ threat intel sources</span>
+                                <span>Signal Guard © 2025</span>
                             </div>
                         </div>
-                    ) : null}
+                    ) : (
+                        <div className="flex items-center justify-center h-[380px] text-muted-foreground text-sm italic">
+                            Awaiting signal input...
+                        </div>
+                    )}
                 </div>
 
-                {/* Input Section */}
                 <div className="border-t border-border p-4 bg-card/50">
                     <form onSubmit={handleSubmit} className="space-y-3">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <span className="text-success">❯</span>
-                            <span className="font-medium">risksignal</span>
-                            <span className="text-muted-foreground">check --ip</span>
+                            <span className="font-medium text-foreground">guard</span>
+                            <span className="text-muted-foreground">scan --remote</span>
                         </div>
                         <Input
                             type="text"
-                            placeholder="Enter IP address (e.g., 8.8.8.8, 1.1.1.1)"
+                            placeholder="Remote IP Address..."
                             value={ipInput}
                             onChange={(e) => setIpInput(e.target.value)}
-                            className="bg-background border-border font-mono text-sm h-10 focus:border-foreground/50 transition-colors"
+                            className="bg-background border-border font-mono text-sm h-10 focus:ring-0 focus:border-foreground/50 transition-colors"
                         />
                         <Button
                             type="submit"
@@ -755,12 +730,12 @@ const IPLookupDemo = () => {
                             {isLoading ? (
                                 <span className="flex items-center gap-2">
                                     <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
-                                    Analyzing...
+                                    Scrutinizing...
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
                                     <Shield className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    Check IP Address
+                                    Execute Deep Scan
                                 </span>
                             )}
                         </Button>
@@ -771,4 +746,4 @@ const IPLookupDemo = () => {
     );
 };
 
-export default IPLookupDemo;
+export default IPScanner;
