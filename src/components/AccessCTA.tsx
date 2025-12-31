@@ -10,15 +10,12 @@ const AccessCTA = () => {
 
                 <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center border border-success/30 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                            <Zap className="w-6 h-6 text-success animate-pulse" />
-                        </div>
                         <div className="text-center md:text-left">
                             <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                                Signal Access & API
+                                API Access
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                                Integrate professional IP signal intelligence into your stack. Get 500 requests free.
+                                Integrate our IP intelligence into your application.
                             </p>
                         </div>
                     </div>

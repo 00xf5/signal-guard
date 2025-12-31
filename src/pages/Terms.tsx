@@ -20,8 +20,7 @@ const Terms = () => {
                             Terms of <span className="text-gradient">Service.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground leading-relaxed">
-                            Welcome to RiskSignal. By accessing our platform or utilizing our API,
-                            you agree to the following contractual obligations.
+                            Welcome to RiskSignal. By using our platform or API, you agree to these terms.
                         </p>
                     </div>
 
@@ -32,9 +31,8 @@ const Terms = () => {
                                 <h3>Permitted Use</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                RiskSignal is designed for security professionals and application developers.
-                                You may use our intelligence to protect your infrastructure from fraud, automation, and abuse.
-                                Redistributing our raw telemetry data without prior authorization is strictly prohibited.
+                                You may use our intelligence to protect your systems from fraud and abuse.
+                                Redistributing raw data is prohibited.
                             </p>
                         </div>
 
@@ -44,8 +42,7 @@ const Terms = () => {
                                 <h3>API Quota & Limits</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                Our free tier provides 500 requests per email registration.
-                                Attempts to circumvent this limit through temporary emails or automated generation will result in a permanent ban of your infrastructure's IP range from our platform.
+                                Our free tier includes 500 requests. Circumventing this limit will result in a permanent ban.
                             </p>
                         </div>
 
@@ -55,8 +52,8 @@ const Terms = () => {
                                 <h3>No Guarantee of Accuracy</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                RiskSignal provides intelligence "as-is." IP reputations change dynamically.
-                                While we strive for 99.9% accuracy in infrastructure detection, we do not guarantee that our scores represent absolute truth. RiskSignal shall not be liable for any automated blocking decisions made by your application.
+                                We provide intelligence "as-is." IP reputations change dynamically.
+                                We do not guarantee absolute accuracy and are not liable for decisions made based on our scores.
                             </p>
                         </div>
                     </div>

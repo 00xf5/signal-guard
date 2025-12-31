@@ -12,7 +12,7 @@ const Footer = () => {
             </Link>
 
             <p className="text-sm text-muted-foreground max-w-xs">
-              Security intelligence for risk scoring and anonymity detection.
+              Professional IP Intelligence.
             </p>
           </div>
 

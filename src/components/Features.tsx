@@ -48,24 +48,18 @@ const Features = () => {
   return (
     <section className="py-24 border-t border-border" id="features">
       <div className="container">
-        {/* Section header */}
         <ScrollReveal>
           <div className="mb-16">
-            <div className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-              <span className="w-8 h-px bg-border" />
-              CAPABILITIES
-            </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Intelligence, not guesswork.
+              Intelligence System
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              RiskSignal aggregates and correlates data from multiple providers to deliver
-              actionable intelligence — not vibes.
+              RiskSignal aggregates data from multiple providers to deliver
+              actionable IP intelligence.
             </p>
           </div>
         </ScrollReveal>
 
-        {/* Features grid */}
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <ScrollReveal key={feature.category} delay={index * 100}>

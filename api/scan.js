@@ -4,14 +4,12 @@ const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
 export default async function handler(req, res) {
-    // 0. Safety Check
     if (!supabaseUrl || !supabaseAnonKey) {
         return res.status(500).json({ error: 'Server configuration error.' });
     }
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    // 1. Method & Auth
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
     const { ip } = req.query;
     const apiKey = req.headers['x-api-key'];
@@ -28,12 +26,10 @@ export default async function handler(req, res) {
         if (authError || !accessData) return res.status(401).json({ error: 'Invalid API Key' });
         if (accessData.usage_count >= accessData.max_usage) return res.status(429).json({ error: 'Quota exhausted' });
 
-        // 2. Fetch Base Intelligence
         const ipResponse = await fetch(`https://ipwho.is/${ip}`);
         const data = await ipResponse.json();
         if (!data.success) return res.status(400).json({ error: data.message });
 
-        // 3. Signal Intelligence Logic
         const INFRA_ASNS = ["212238", "13335", "15169", "54113", "16509", "14061", "16276", "24940"];
         const INFRA_ISPS = ["datacamp", "m247", "akamai", "cloudflare", "digitalocean", "linode", "ovh", "hetzner"];
 
@@ -46,7 +42,6 @@ export default async function handler(req, res) {
         const isProxy = data.security?.proxy === true;
         const isHosting = data.security?.hosting === true || (isInfra && !isVPN);
 
-        // 4. Reputation & Scamalytics-style Scoring
         let riskScore = 0;
         const signals = [];
 
@@ -57,15 +52,12 @@ export default async function handler(req, res) {
         if (isHosting) { riskScore += 20; signals.push("DATACENTER_IP"); }
         if (data.security?.bogon) { riskScore += 100; signals.push("BOGON_IP_ALERT"); }
 
-        // 5. Fraud Context (The "Fucking Catchy" Part)
         const fraudScore = Math.min(riskScore + (isInfra ? 15 : 0), 100);
         const trustLevel = fraudScore < 15 ? "PREMIUM" : (fraudScore < 50 ? "NEUTRAL" : "HIGH_RISK");
         const verdict = fraudScore < 25 ? "ALLOW" : (fraudScore < 70 ? "REVIEW" : "BLOCK");
 
-        // 6. Sync Usage
         await supabase.from('api_access').update({ usage_count: accessData.usage_count + 1 }).eq('id', accessData.id);
 
-        // 7. God-Mode JSON Response
         return res.status(200).json({
             status: "success",
             metadata: {

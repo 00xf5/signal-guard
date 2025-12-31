@@ -17,20 +17,14 @@ const DataSources = () => {
     <section className="py-24 border-t border-border" id="sources">
       <div className="container">
         <ScrollReveal>
-          <div className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-            <span className="w-8 h-px bg-border" />
-            DATA SOURCES
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Aggregated intelligence.
+            Intelligence Sources
           </h2>
           <p className="text-muted-foreground mb-12 max-w-xl">
-            RiskSignal aggregates and correlates data from multiple providers. 
-            We provide derived intelligence — not raw data resale.
+            Correlating data from multiple providers to deliver derived intelligence.
           </p>
         </ScrollReveal>
 
-        {/* Table */}
         <ScrollReveal delay={200}>
           <div className="border border-border overflow-hidden max-w-2xl">
             <div className="grid grid-cols-[auto_1fr_2fr] bg-secondary/50 text-sm">
@@ -41,11 +35,10 @@ const DataSources = () => {
             {sources.map((source, index) => {
               const Icon = source.icon;
               return (
-                <div 
+                <div
                   key={source.provider}
-                  className={`grid grid-cols-[auto_1fr_2fr] text-sm transition-all duration-300 ${
-                    index !== sources.length - 1 ? 'border-b border-border' : ''
-                  } ${hoveredRow === index ? 'bg-secondary/30' : ''}`}
+                  className={`grid grid-cols-[auto_1fr_2fr] text-sm transition-all duration-300 ${index !== sources.length - 1 ? 'border-b border-border' : ''
+                    } ${hoveredRow === index ? 'bg-secondary/30' : ''}`}
                   onMouseEnter={() => setHoveredRow(index)}
                   onMouseLeave={() => setHoveredRow(null)}
                   style={{
@@ -67,7 +60,6 @@ const DataSources = () => {
           </div>
         </ScrollReveal>
 
-        {/* Disclaimer */}
         <ScrollReveal delay={400}>
           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-6 p-3 border border-border/50 max-w-fit">
             <Database className="w-3 h-3" />

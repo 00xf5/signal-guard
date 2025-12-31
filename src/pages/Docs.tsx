@@ -95,8 +95,8 @@ func main() {
                                 Integration <span className="text-gradient">Guide.</span>
                             </h1>
                             <p className="text-lg text-muted-foreground leading-relaxed">
-                                Our REST API allows you to programmatically query IP intelligence and threat scores.
-                                Implementation is simple, header-based, and built for scale.
+                                Programmatically query IP intelligence and threat scores.
+                                Implementation is header-based and designed for scale.
                             </p>
                         </div>
 
@@ -216,8 +216,7 @@ func main() {
 
                         <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6 space-y-3">
                             <h4 className="flex items-center gap-2 font-bold text-xs text-blue-400">
-                                <Zap className="w-3.5 h-3.5" />
-                                PRO TIP
+                                NOTE
                             </h4>
                             <p className="text-xs text-muted-foreground leading-relaxed">
                                 Always perform IP scanning server-side. Exposing your API Key in clear-text frontend code may allow others to exhaust your quota.

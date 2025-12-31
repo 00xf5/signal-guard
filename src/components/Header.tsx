@@ -5,17 +5,17 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="container flex items-center justify-between h-14">
-        <Link to="/" className="flex items-center gap-2 font-semibold" title="RiskSignal - Professional IP Intelligence Home">
-          <img src="/favicon.png" alt="RiskSignal Security Logo" className="w-6 h-6 object-contain" />
+        <Link to="/" className="flex items-center gap-2 font-semibold">
+          <img src="/favicon.png" alt="Logo" className="w-6 h-6 object-contain" />
           <span>RiskSignal</span>
         </Link>
 
 
         <nav className="hidden md:flex items-center gap-8 text-sm">
-          <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors" title="Deep IP features and threat detection">
+          <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
             Features
           </a>
-          <a href="#scoring" className="text-muted-foreground hover:text-foreground transition-colors" title="How our risk scoring system works">
+          <a href="#scoring" className="text-muted-foreground hover:text-foreground transition-colors">
             Scoring
           </a>
         </nav>

@@ -20,8 +20,7 @@ const Privacy = () => {
                             Privacy <span className="text-gradient">Policy.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground leading-relaxed">
-                            At RiskSignal, we prioritize the integrity of your data and the transparency of our intelligence operations.
-                            This policy outlines how we handle information in our IP intelligence ecosystem.
+                            This policy outlines how we handle information in our IP intelligence system.
                         </p>
                     </div>
 
@@ -32,9 +31,8 @@ const Privacy = () => {
                                 <h3>Data Collection</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                RiskSignal collects technical telemetry related to IP addresses to provide risk assessments.
-                                This includes geolocation, network infrastructure details, and reputation markers.
-                                We do not collect personally identifiable information (PII) of end-users beyond what is strictly necessary for API quota management (e.g., your work email).
+                                We collect technical telemetry related to IP addresses, including geolocation and network infrastructure details.
+                                No personally identifiable information is collected beyond what is required for API quota management.
                             </p>
                         </div>
 
@@ -44,8 +42,7 @@ const Privacy = () => {
                                 <h3>Signal Security</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                All intelligence queries processed through our API are encrypted in transit.
-                                We employ advanced server-side protections to ensure that your integration remains secure and isolated from other tenants.
+                                API queries are encrypted in transit. We maintain isolation between individual API keys and their usage data.
                             </p>
                         </div>
 
@@ -55,8 +52,7 @@ const Privacy = () => {
                                 <h3>Usage Intelligence</h3>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
-                                Usage telemetry is tracked solely for the purpose of quota enforcement and security monitoring.
-                                Our team periodically reviews high-risk signals to improve our detection algorithms and prevent platform abuse.
+                                Usage telemetry is tracked for quota enforcement and security monitoring to prevent platform abuse.
                             </p>
                         </div>
                     </div>

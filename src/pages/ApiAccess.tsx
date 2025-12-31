@@ -69,16 +69,12 @@ const ApiAccess = () => {
 
                 <div className="space-y-12">
                     <div className="space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-xs font-bold tracking-widest uppercase">
-                            <Zap className="w-3 h-3" />
-                            Developer Portal
-                        </div>
                         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
                             Generate your <span className="text-gradient">Access Key.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                            Start integrating Signal Guard's intelligence into your own infrastructure.
-                            Each key includes 500 requests for professional threat assessment.
+                            Integrate our intelligence into your systems.
+                            Each key includes a 500-request quota.
                         </p>
                     </div>
 
@@ -147,11 +143,9 @@ const ApiAccess = () => {
 
                                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                                         <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                                            <Zap className="w-3.5 h-3.5 text-warning" />
                                             Quota: 500 Requests
                                         </div>
                                         <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                                            <Key className="w-3.5 h-3.5 text-success" />
                                             Persistence: Permanent
                                         </div>
                                     </div>
@@ -176,11 +170,10 @@ const ApiAccess = () => {
                             <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center border border-info/20">
                                 <Code2 className="w-4 h-4 text-info" />
                             </div>
-                            <h2 className="text-xl font-bold">API Intelligence Preview</h2>
+                            <h2 className="text-xl font-bold">API Preview</h2>
                         </div>
 
                         <div className="grid lg:grid-cols-2 gap-4">
-                            {/* Request Column */}
                             <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
                                 <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
                                     <div className="flex gap-4">
@@ -200,10 +193,9 @@ const ApiAccess = () => {
                                 <div className="p-5 flex-1 font-mono text-xs sm:text-[13px] leading-relaxed text-foreground/80">
                                     {previewLang === 'javascript' && (
                                         <pre className="text-info/90">
-                                            {`// GET /api/scan?ip=73.124.52.11
-const res = await fetch(url, {
+                                            {`const res = await fetch(url, {
   headers: { 
-    'x-api-key': '0c3b8ed...' 
+    'x-api-key': 'your_key' 
   }
 });
 const data = await res.json();`}
@@ -211,29 +203,26 @@ const data = await res.json();`}
                                     )}
                                     {previewLang === 'python' && (
                                         <pre className="text-warning/80">
-                                            {`# GET /api/scan?ip=73.124.52.11
-headers = {'x-api-key': '0c3b8ed...'}
+                                            {`headers = {'x-api-key': 'your_key'}
 res = requests.get(url, headers=headers)
 data = res.json()`}
                                         </pre>
                                     )}
                                     {previewLang === 'go' && (
                                         <pre className="text-success/80">
-                                            {`// GET /api/scan?ip=73.124.52.11
-req, _ := http.NewRequest("GET", url, nil)
-req.Header.Set("x-api-key", "0c3b8ed...")
+                                            {`req, _ := http.NewRequest("GET", url, nil)
+req.Header.Set("x-api-key", "your_key")
 resp, _ := client.Do(req)`}
                                         </pre>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Response Column */}
                             <div className="bg-black/60 border border-white/10 rounded-2xl overflow-hidden flex flex-col group/resp">
                                 <div className="flex items-center justify-between px-4 py-3 bg-success/5 border-b border-white/5">
                                     <span className="text-[10px] uppercase tracking-tighter text-success font-bold flex items-center gap-1.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                                        Sample Signal Response (USA residential)
+                                        <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                                        Sample Response
                                     </span>
                                     <Database className="w-3.5 h-3.5 text-success/30" />
                                 </div>
@@ -258,7 +247,6 @@ resp, _ := client.Do(req)`}
     },
     "geographic": {
       "country": "United States",
-      "flag": "🇺🇸",
       "city": "Philadelphia",
       "accuracy": { 
         "radius_km": 10, 

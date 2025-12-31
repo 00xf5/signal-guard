@@ -25,21 +25,14 @@ const SEOContent = () => {
         <section className="py-24 border-t border-border bg-secondary/10">
             <div className="container max-w-4xl">
                 <ScrollReveal>
-                    <div className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-                        <span className="w-8 h-px bg-border" />
-                        KNOWLEDGE BASE
-                    </div>
                     <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                        Protecting your digital perimeter.
+                        Technical FAQ
                     </h2>
 
                     <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground mb-12">
                         <p>
-                            In today's threat landscape, simply knowing an IP address is not enough. Sophisticated actors use <strong>residential proxies</strong>,
-                            <strong>Tor networks</strong>, and <strong>encrypted tunnels</strong> to bypass standard security filters.
-                            RiskSignal provides the deep intelligence needed to verify the human behind the connection.
-                            Our engine cross-references geolocation, ASN reliability, and device-level fingerprints to deliver
-                            an accurate risk profile in milliseconds.
+                            RiskSignal facilitates verification of connections by cross-referencing geolocation,
+                            ASN reliability, and browser-level signals to deliver an accurate risk profile.
                         </p>
                     </div>
                 </ScrollReveal>

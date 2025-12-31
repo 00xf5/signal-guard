@@ -53,7 +53,6 @@ interface IPData {
     tzMismatch: boolean;
 }
 
-// Helper to get local IP via WebRTC
 const getWebRTCIP = (): Promise<string | null> => {
     return new Promise((resolve) => {
         try {
@@ -78,7 +77,6 @@ const getWebRTCIP = (): Promise<string | null> => {
     });
 };
 
-// Animated circular gauge component
 const CircularGauge = ({
     value,
     maxValue = 100,
@@ -174,7 +172,6 @@ const CircularGauge = ({
     );
 };
 
-// Animated horizontal bar
 const AnimatedBar = ({
     value,
     label,
@@ -328,7 +325,6 @@ const IPScanner = () => {
             setTimeout(() => setScanPhase(phase), i * 250);
         });
 
-        // Trigger Turnstile reset
         if (window.turnstile && turnstileWidgetId.current) {
             try {
                 window.turnstile.reset(turnstileWidgetId.current);
@@ -344,7 +340,6 @@ const IPScanner = () => {
 
             if (data.success === false) throw new Error(data.message || "Invalid IP");
 
-            // Capture Turnstile response
             let token = null;
             if (window.turnstile && turnstileWidgetId.current) {
                 try {
@@ -356,9 +351,6 @@ const IPScanner = () => {
             setTurnstileToken(token || null);
             setIsVerifyingHuman(false);
 
-            // --- ADVANCED DETECTION LOGIC ---
-
-            // 0. Provider Reputation Intelligence (Override for false negatives)
             const INFRASTRUCTURE_ASNS = ["212238", "13335", "15169", "54113", "16509", "14061", "16276", "24940"];
             const INFRASTRUCTURE_ISPS = ["datacamp", "m247", "akamai", "cloudflare", "digitalocean", "linode", "ovh", "hetzner", "google cloud", "amazon technologies", "microsoft azure"];
 
@@ -368,43 +360,34 @@ const IPScanner = () => {
             const isKnownInfra = INFRASTRUCTURE_ASNS.includes(rawAsn) ||
                 INFRASTRUCTURE_ISPS.some(infra => rawIsp.includes(infra));
 
-            // Force flags if known infra but API says residential
             const isVPN = data.security?.vpn === true || (isKnownInfra && !rawIsp.includes("consumer"));
             const isProxy = data.security?.proxy === true || data.security?.relay === true;
             const isTor = data.security?.tor === true;
             const isHosting = data.security?.hosting === true || (isKnownInfra && !isVPN);
 
-            // 1. WebRTC Leak Check
             const webrtcIp = await getWebRTCIP();
             const webrtcLeaked = webrtcIp && webrtcIp !== data.ip;
 
-            // 2. Timezone Mismatch
             const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const ipTimezone = data.timezone?.id;
             const tzMismatch = ipTimezone && browserTimezone !== ipTimezone;
 
-            // 3. Language Inconsistency
             const browserLangs = navigator.languages || [navigator.language];
             const countryCode = data.country_code?.toLowerCase();
             const langMismatch = !browserLangs.some(lang => lang.toLowerCase().includes(countryCode));
 
-            // 4. Automation Check
             const isAutomation = navigator.webdriver === true;
 
-            // --- REFINED WEIGHTED SCORING ---
-
-            // Risk Score
             let riskScore = 5.0;
             if (isTor) riskScore += 80;
-            else if (isVPN || isProxy) riskScore += 45; // Increased weight
-            if (isKnownInfra && !data.security?.vpn) riskScore += 20; // Reputation penalty
-            if (webrtcLeaked) riskScore += 25; // Massive signal
+            else if (isVPN || isProxy) riskScore += 45;
+            if (isKnownInfra && !data.security?.vpn) riskScore += 20;
+            if (webrtcLeaked) riskScore += 25;
             if (tzMismatch) riskScore += 12;
             if (langMismatch) riskScore += 8;
             if (isAutomation) riskScore += 30;
             if (isHosting && !isVPN) riskScore += 15;
 
-            // Anonymity Score
             let anonymityScore = 5.0;
             if (isTor) anonymityScore += 90;
             else if (isVPN || isProxy) anonymityScore += 65;
@@ -413,16 +396,14 @@ const IPScanner = () => {
             if (webrtcLeaked) anonymityScore += 15;
             if (isHosting) anonymityScore += 10;
 
-            // Fraud Score
             let fraudScore = 5.0;
             if (isTor) fraudScore += 85;
             if (isVPN || (isKnownInfra && !rawIsp.includes("consumer"))) fraudScore += 40;
             if (isAutomation) fraudScore += 60;
             if (isHosting) fraudScore += 30;
             if (tzMismatch && (isVPN || isProxy)) fraudScore += 25;
-            if (!token) fraudScore += 5; // Penalty for missing validation (bot signal)
+            if (!token) fraudScore += 5;
 
-            // Abuse Score
             let abuseScore = 5.0;
             if (isTor) abuseScore += 75;
             if (isHosting || isKnownInfra) abuseScore += 45;
@@ -478,7 +459,6 @@ const IPScanner = () => {
     useEffect(() => {
         lookupIP("");
 
-        // Initialize Invisible Turnstile
         const timer = setInterval(() => {
             if (window.turnstile) {
                 const id = window.turnstile.render("#turnstile-widget", {
@@ -521,7 +501,6 @@ const IPScanner = () => {
 
     return (
         <div className="w-full">
-            {/* Hidden Cloudflare Bridge */}
             <div id="turnstile-widget" style={{ display: 'none' }}></div>
 
             <div className="border border-border bg-card overflow-hidden">
@@ -529,11 +508,7 @@ const IPScanner = () => {
                     <span className="w-3 h-3 rounded-full bg-danger/60 hover:bg-danger transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-warning/60 hover:bg-warning transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-success/60 hover:bg-success transition-colors cursor-pointer" />
-                    <span className="ml-2 text-sm text-muted-foreground font-medium">risksignal — active scanner</span>
-                    <div className="ml-auto flex items-center gap-2">
-                        <PulsingDot color="bg-success" />
-                        <span className="text-xs text-success font-semibold tracking-wide">LIVE</span>
-                    </div>
+                    <span className="ml-2 text-sm text-muted-foreground font-medium">signal guard — scanner</span>
                 </div>
 
                 <div className="p-4 space-y-4 min-h-[420px]">
@@ -735,7 +710,7 @@ const IPScanner = () => {
                             ) : (
                                 <span className="flex items-center gap-2">
                                     <Shield className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    Execute Deep Scan
+                                    Scan Address
                                 </span>
                             )}
                         </Button>

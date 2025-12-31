@@ -23,10 +23,10 @@ const signals = [
 ];
 
 // Animated score bar component
-const AnimatedScoreBar = ({ 
+const AnimatedScoreBar = ({
   segments,
-  isVisible 
-}: { 
+  isVisible
+}: {
   segments: { width: string; color: string }[];
   isVisible: boolean;
 }) => {
@@ -44,7 +44,7 @@ const AnimatedScoreBar = ({
   return (
     <div className="h-3 w-full bg-secondary flex overflow-hidden mb-6">
       {segments.map((segment, i) => (
-        <div 
+        <div
           key={i}
           className={`h-full ${segment.color} transition-all duration-1000 ease-out relative overflow-hidden`}
           style={{ width: widths[i] }}
@@ -64,19 +64,14 @@ const Scoring = () => {
     <section className="py-24 border-t border-border" id="scoring">
       <div className="container">
         <ScrollReveal>
-          <div className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-            <span className="w-8 h-px bg-border" />
-            SCORING SYSTEM
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-12">
-            Transparent scoring.
+            Scoring System
           </h2>
         </ScrollReveal>
 
         <div className="grid md:grid-cols-2 gap-12 mb-16">
-          {/* Risk Score */}
           <ScrollReveal delay={100}>
-            <div 
+            <div
               className="border border-border p-6 glow-card hover-lift"
               ref={(el) => {
                 if (el) {
@@ -94,8 +89,8 @@ const Scoring = () => {
               <p className="text-sm text-muted-foreground mb-6">
                 Range: 0–100 — Likelihood of malicious activity
               </p>
-              
-              <AnimatedScoreBar 
+
+              <AnimatedScoreBar
                 isVisible={isRiskVisible}
                 segments={[
                   { width: '29%', color: 'bg-success' },
@@ -106,10 +101,10 @@ const Scoring = () => {
 
               <div className="space-y-3">
                 {riskLevels.map((level, i) => (
-                  <div 
-                    key={level.range} 
+                  <div
+                    key={level.range}
                     className="flex items-center gap-3 text-sm transition-all duration-300"
-                    style={{ 
+                    style={{
                       opacity: isRiskVisible ? 1 : 0,
                       transform: isRiskVisible ? 'translateX(0)' : 'translateX(-10px)',
                       transitionDelay: `${i * 100 + 300}ms`
@@ -124,9 +119,8 @@ const Scoring = () => {
             </div>
           </ScrollReveal>
 
-          {/* Anonymity Score */}
           <ScrollReveal delay={200}>
-            <div 
+            <div
               className="border border-border p-6 glow-card hover-lift"
               ref={(el) => {
                 if (el) {
@@ -144,8 +138,8 @@ const Scoring = () => {
               <p className="text-sm text-muted-foreground mb-6">
                 Range: 0–100% — Difficulty of attributing activity to a real user
               </p>
-              
-              <AnimatedScoreBar 
+
+              <AnimatedScoreBar
                 isVisible={isAnonymityVisible}
                 segments={[
                   { width: '30%', color: 'bg-success' },
@@ -156,10 +150,10 @@ const Scoring = () => {
 
               <div className="space-y-3">
                 {anonymityLevels.map((level, i) => (
-                  <div 
-                    key={level.range} 
+                  <div
+                    key={level.range}
                     className="flex items-center gap-3 text-sm transition-all duration-300"
-                    style={{ 
+                    style={{
                       opacity: isAnonymityVisible ? 1 : 0,
                       transform: isAnonymityVisible ? 'translateX(0)' : 'translateX(-10px)',
                       transitionDelay: `${i * 100 + 300}ms`
@@ -175,7 +169,6 @@ const Scoring = () => {
           </ScrollReveal>
         </div>
 
-        {/* Weighted Signals */}
         <ScrollReveal delay={300}>
           <div className="border border-border p-6 max-w-xl glow-card">
             <h3 className="text-lg font-semibold mb-4">Weighted Signals Include:</h3>
