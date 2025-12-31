@@ -11,7 +11,7 @@ const ThemeToggle = () => {
       variant="ghost"
       size="sm"
       onClick={toggleTheme}
-      className="fixed top-20 right-4 z-[60] p-2 rounded-full"
+      className="p-2 rounded-full hover:bg-muted transition-colors"
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (

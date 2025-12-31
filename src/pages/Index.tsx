@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import ThemeProvider, { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -11,25 +10,20 @@ import Footer from "@/components/Footer";
 
 
 const Index = () => {
-  const { theme } = useTheme();
-
   return (
-    <ThemeProvider>
-      <div className={`min-h-screen bg-background ${theme === 'dark' ? 'dark' : 'light'}`}>
-        <Header />
-        <ThemeToggle />
-        <main className="pt-14">
-          <Hero />
-          <Features />
-          <Scoring />
-          <DataSources />
-          <Philosophy />
-          <SEOContent />
-        </main>
-        <Footer />
-
-      </div>
-    </ThemeProvider>
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <ThemeToggle />
+      <main className="pt-14">
+        <Hero />
+        <Features />
+        <Scoring />
+        <DataSources />
+        <Philosophy />
+        <SEOContent />
+      </main>
+      <Footer />
+    </div>
   );
 };
 

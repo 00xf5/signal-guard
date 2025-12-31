@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
   return (
@@ -20,7 +21,7 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center gap-3">
-          {/* Header actions removed as per request */}
+          <ThemeToggle />
         </div>
       </div>
     </header>
