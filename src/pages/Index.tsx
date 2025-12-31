@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
 import Hero from "@/components/Hero";
+import AccessCTA from "@/components/AccessCTA";
 import Features from "@/components/Features";
 import Scoring from "@/components/Scoring";
 import DataSources from "@/components/DataSources";
@@ -16,6 +17,7 @@ const Index = () => {
       <ThemeToggle />
       <main className="pt-14">
         <Hero />
+        <AccessCTA />
         <Features />
         <Scoring />
         <DataSources />
