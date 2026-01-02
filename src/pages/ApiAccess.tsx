@@ -7,11 +7,22 @@ import { supabase } from "@/lib/supabase";
 import { Key, Copy, Check, Zap, ArrowLeft, ShieldCheck, Mail, Code2, Terminal, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import Meta from "@/components/Meta";
 
 const ApiAccess = () => {
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+
+    const apiJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "RiskSignal API",
+        "url": "https://risksignal-tau.vercel.app/api-access",
+        "description": "High-fidelity VPN and Proxy detection API. Scalable IP intelligence for production environments.",
+        "applicationCategory": "SecurityApplication",
+        "featureList": ["VPN Detection", "Proxy Detection", "Tor identification", "IP Risk Scoring"]
+    };
     const [isCopied, setIsCopied] = useState(false);
     const [previewLang, setPreviewLang] = useState('javascript');
 
@@ -59,6 +70,12 @@ const ApiAccess = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
+            <Meta
+                title="VPN & Proxy Detection API Access"
+                description="Get instant access to the RiskSignal IP Intelligence API. Integrate real-time VPN detection, proxy identification, and risk scoring into your app."
+                keywords="VPN Detection API, Proxy Detection API, IP Intelligence SDK, Risk Scoring SDK, Developer API Security"
+                jsonLd={apiJsonLd}
+            />
             <Header />
 
             <main className="pt-24 pb-20 container max-w-4xl px-4">
@@ -70,11 +87,11 @@ const ApiAccess = () => {
                 <div className="space-y-12">
                     <div className="space-y-4">
                         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                            Generate your <span className="text-gradient">Access Key.</span>
+                            Get an <span className="text-gradient">API Key.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                            Integrate our intelligence into your systems.
-                            Each key includes a 500-request quota.
+                            Integrate our intelligence into your own tools.
+                            Each key comes with 500 free requests.
                         </p>
                     </div>
 
@@ -108,7 +125,7 @@ const ApiAccess = () => {
                                     className="w-full h-12 text-lg font-bold bg-white text-black hover:bg-white/90"
                                     disabled={isLoading}
                                 >
-                                    {isLoading ? "Provisioning..." : "Generate API Key"}
+                                    {isLoading ? "Generating..." : "Get API Key"}
                                 </Button>
                             </form>
                         </div>
@@ -120,20 +137,20 @@ const ApiAccess = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-bold text-success">Generation Successful</h3>
-                                    <p className="text-sm text-muted-foreground">Your unique 24-digit hex key is ready for use.</p>
+                                    <h3 className="text-xl font-bold text-success">Key Ready</h3>
+                                    <p className="text-sm text-muted-foreground">Your unique 24-digit key is ready to use.</p>
                                 </div>
 
                                 <div className="space-y-4">
                                     <div className="relative group/key">
                                         <div className="absolute -inset-1 bg-gradient-to-r from-success/20 via-success/10 to-success/20 rounded-lg blur opacity-25 group-hover/key:opacity-75 transition duration-1000"></div>
-                                        <div className="relative flex items-center justify-between bg-muted/50 border border-border rounded-lg p-6 font-mono shadow-2xl">
+                                        <div className="relative flex items-center justify-between bg-terminal-bg/50 border border-panel-border rounded-lg p-6 font-mono shadow-2xl">
                                             <span className="text-xl sm:text-2xl tracking-tighter text-success font-bold break-all mr-4">
                                                 {generatedKey}
                                             </span>
                                             <button
                                                 onClick={copyToClipboard}
-                                                className="shrink-0 p-3 rounded-lg bg-white/5 hover:bg-success/10 text-muted-foreground hover:text-success transition-all border border-white/5"
+                                                className="shrink-0 p-3 rounded-lg bg-foreground/5 hover:bg-success/10 text-muted-foreground hover:text-success transition-all border border-panel-border"
                                                 title="Copy API Key"
                                             >
                                                 {isCopied ? <Check className="w-5 h-5 text-success" /> : <Copy className="w-5 h-5" />}
@@ -142,10 +159,10 @@ const ApiAccess = () => {
                                     </div>
 
                                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                                        <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                                        <div className="flex items-center gap-1.5 bg-foreground/5 px-3 py-1.5 rounded-full border border-panel-border">
                                             Quota: 500 Requests
                                         </div>
-                                        <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                                        <div className="flex items-center gap-1.5 bg-foreground/5 px-3 py-1.5 rounded-full border border-panel-border">
                                             Persistence: Permanent
                                         </div>
                                     </div>
@@ -174,8 +191,8 @@ const ApiAccess = () => {
                         </div>
 
                         <div className="grid lg:grid-cols-2 gap-4">
-                            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden flex flex-col">
-                                <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+                            <div className="bg-terminal-bg/40 border border-panel-border rounded-2xl overflow-hidden flex flex-col">
+                                <div className="flex items-center justify-between px-4 py-3 bg-foreground/5 border-b border-panel-border">
                                     <div className="flex gap-4">
                                         {['javascript', 'python', 'go'].map((lang) => (
                                             <button
@@ -218,15 +235,15 @@ resp, _ := client.Do(req)`}
                                 </div>
                             </div>
 
-                            <div className="bg-black/60 border border-white/10 rounded-2xl overflow-hidden flex flex-col group/resp">
-                                <div className="flex items-center justify-between px-4 py-3 bg-success/5 border-b border-white/5">
+                            <div className="bg-terminal-bg/60 border border-panel-border rounded-2xl overflow-hidden flex flex-col group/resp">
+                                <div className="flex items-center justify-between px-4 py-3 bg-success/5 border-b border-panel-border">
                                     <span className="text-[10px] uppercase tracking-tighter text-success font-bold flex items-center gap-1.5">
                                         <div className="w-1.5 h-1.5 rounded-full bg-success" />
                                         Sample Response
                                     </span>
                                     <Database className="w-3.5 h-3.5 text-success/30" />
                                 </div>
-                                <div className="p-5 max-h-[280px] overflow-y-auto font-mono text-[11px] sm:text-xs leading-tight scrollbar-hide bg-black/20">
+                                <div className="p-5 max-h-[280px] overflow-y-auto font-mono text-[11px] sm:text-xs leading-tight scrollbar-hide bg-terminal-bg/20">
                                     <pre className="text-success/70">
                                         {`{
   "status": "success",
@@ -265,7 +282,7 @@ resp, _ := client.Do(req)`}
                         </div>
                     </div>
 
-                    <div className="grid sm:grid-cols-3 gap-6 pt-12 border-t border-white/5">
+                    <div className="grid sm:grid-cols-3 gap-6 pt-12 border-t border-panel-border">
                         <div className="space-y-2">
                             <h4 className="font-bold text-sm uppercase tracking-widest text-muted-foreground">High Speed</h4>
                             <p className="text-xs text-muted-foreground">Global edge nodes ensure &lt;50ms response times for all key-based scans.</p>
@@ -275,7 +292,7 @@ resp, _ := client.Do(req)`}
                             <p className="text-xs text-muted-foreground">Header-based authentication. No session tracking or cookies required.</p>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Detailed</h4>
+                            <h4 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Response Fields</h4>
                             <p className="text-xs text-muted-foreground">Full JSON access to WebRTC leaks, ASN reputation, and threat scores.</p>
                         </div>
                     </div>

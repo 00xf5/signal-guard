@@ -1,11 +1,19 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin/
 Disallow: /_next/
 Disallow: /static/
 
-# Explicitly point to the sitemap for indexing
 Sitemap: https://risksignal-tau.vercel.app/sitemap.xml
 
-# Tell crawlers to be efficient
+Disallow: /*/detailed
+Disallow: /*/reputation
+
+# But allow the parent tools to be indexed
+Allow: /discovery
+Allow: /api-access
+Allow: /docs
+Allow: /about
+
 Crawl-delay: 1

@@ -31,8 +31,8 @@ const SEOContent = () => {
 
                     <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground mb-12">
                         <p>
-                            RiskSignal facilitates verification of connections by cross-referencing geolocation,
-                            ASN reliability, and browser-level signals to deliver an accurate risk profile.
+                            RiskSignal checks connections by cross-referencing geolocation,
+                            ASN reputation, and browser signals to deliver an accurate risk profile.
                         </p>
                     </div>
                 </ScrollReveal>

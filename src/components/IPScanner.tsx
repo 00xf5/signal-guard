@@ -508,7 +508,7 @@ const IPScanner = () => {
                     <span className="w-3 h-3 rounded-full bg-danger/60 hover:bg-danger transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-warning/60 hover:bg-warning transition-colors cursor-pointer" />
                     <span className="w-3 h-3 rounded-full bg-success/60 hover:bg-success transition-colors cursor-pointer" />
-                    <span className="ml-2 text-sm text-muted-foreground font-medium">signal guard — scanner</span>
+                    <span className="ml-2 text-sm text-muted-foreground font-medium">risksignal — scanner</span>
                 </div>
 
                 <div className="p-4 space-y-4 min-h-[420px]">
@@ -521,16 +521,16 @@ const IPScanner = () => {
                             </div>
                             <div className="text-center">
                                 <div className="text-sm font-medium mb-2">
-                                    {isVerifyingHuman ? "Validating Session Integrity" : "Analyzing IP Intelligence"}
+                                    {isVerifyingHuman ? "Verifying session..." : "Analyzing IP..."}
                                 </div>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className={scanPhase >= 1 ? "text-success" : ""}>Geo-Crosscheck</span>
+                                    <span className={scanPhase >= 1 ? "text-success" : ""}>Location</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 2 ? "text-success" : ""}>Browser Leak Check</span>
+                                    <span className={scanPhase >= 2 ? "text-success" : ""}>Leaks</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 3 ? "text-success" : ""}>Human Verification</span>
+                                    <span className={scanPhase >= 3 ? "text-success" : ""}>Human</span>
                                     <span>→</span>
-                                    <span className={scanPhase >= 4 ? "text-success" : ""}>Final Report</span>
+                                    <span className={scanPhase >= 4 ? "text-success" : ""}>Done</span>
                                 </div>
                             </div>
                         </div>
@@ -671,7 +671,7 @@ const IPScanner = () => {
                                     Encryption verified
                                     {turnstileToken && <Lock className="w-2.5 h-2.5 text-success animate-pulse" />}
                                 </span>
-                                <span>Signal Guard © 2025</span>
+                                <span>RiskSignal © 2026</span>
                             </div>
                         </div>
                     ) : (

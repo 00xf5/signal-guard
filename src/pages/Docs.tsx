@@ -5,9 +5,19 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Copy, Check, Terminal, Code2, Globe, Database, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import Meta from "@/components/Meta";
 
 const Docs = () => {
     const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    const docsJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "RiskSignal API Documentation",
+        "description": "Technical guide and API reference for integrating the RiskSignal IP Intelligence and VPN detection platform.",
+        "url": "https://risksignal-tau.vercel.app/docs",
+        "articleSection": "API Guide"
+    };
 
     const copyCode = (code: string, id: string) => {
         navigator.clipboard.writeText(code);
@@ -17,8 +27,8 @@ const Docs = () => {
     };
 
     const CodeBlock = ({ code, language, id }: { code: string; language: string; id: string }) => (
-        <div className="relative group bg-black/50 border border-white/10 rounded-xl overflow-hidden mt-4">
-            <div className="flex justify-between items-center px-4 py-2 border-b border-white/5 bg-white/5">
+        <div className="relative group bg-terminal-bg/50 border border-panel-border rounded-xl overflow-hidden mt-4">
+            <div className="flex justify-between items-center px-4 py-2 border-b border-panel-border bg-foreground/5">
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{language}</span>
                 <button
                     onClick={() => copyCode(code, id)}
@@ -80,6 +90,12 @@ func main() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
+            <Meta
+                title="API Documentation & Technical Reference"
+                description="Comprehensive guide for integrating the RiskSignal IP Intelligence API. Documentation for VPN detection, proxy identification, and forensic network audits."
+                keywords="API Documentation, IP Intelligence SDK, VPN Detection Guide, Proxy Detection Reference, RiskSignal Technical Docs"
+                jsonLd={docsJsonLd}
+            />
             <Header />
 
             <main className="pt-24 pb-20 container max-w-5xl px-4">
@@ -92,11 +108,10 @@ func main() {
                     <div className="space-y-12">
                         <div className="space-y-4">
                             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                                Integration <span className="text-gradient">Guide.</span>
+                                API <span className="text-gradient">Docs.</span>
                             </h1>
                             <p className="text-lg text-muted-foreground leading-relaxed">
-                                Programmatically query IP intelligence and threat scores.
-                                Implementation is header-based and designed for scale.
+                                Query IP intelligence and threat scores directly from your code.
                             </p>
                         </div>
 
@@ -107,7 +122,7 @@ func main() {
                                 </div>
                                 <h2 className="text-2xl font-bold">Base Endpoint</h2>
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-3 group">
+                            <div className="bg-foreground/5 border border-panel-border rounded-xl p-4 flex items-center gap-3 group">
                                 <span className="px-2 py-0.5 rounded bg-success/20 text-success text-[10px] font-bold tracking-widest uppercase">GET</span>
                                 <code className="text-sm font-mono text-foreground/80 break-all">https://risksignal-tau.vercel.app/api/scan</code>
                             </div>
@@ -121,7 +136,7 @@ func main() {
                                 <h2 className="text-2xl font-bold">Authentication</h2>
                             </div>
                             <p className="text-muted-foreground">
-                                Pass your 24-digit hexadecimal key in the <code className="text-xs bg-white/5 px-1.5 py-0.5 rounded border border-white/10">x-api-key</code> header.
+                                Pass your 24-digit hexadecimal key in the <code className="text-xs bg-foreground/5 px-1.5 py-0.5 rounded border border-panel-border">x-api-key</code> header.
                                 All requests without a valid header or targeting an exhausted quota will return a 401 Unauthorized status.
                             </p>
                         </section>
@@ -172,7 +187,7 @@ func main() {
 
                     <aside className="space-y-8">
                         <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
-                            <h4 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Data Dictionary</h4>
+                            <h4 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Response Fields</h4>
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
@@ -188,7 +203,7 @@ func main() {
                                         <span className="font-mono text-info">security.verdict</span>
                                         <span className="text-muted-foreground uppercase text-[9px]">String</span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">Strategic recommendation: ALLOW, REVIEW, or BLOCK.</p>
+                                    <p className="text-xs text-muted-foreground">The recommended action: ALLOW, REVIEW, or BLOCK.</p>
                                 </div>
 
                                 <div className="space-y-2">
@@ -200,7 +215,7 @@ func main() {
                                 </div>
 
                                 <div className="space-y-2 text-xs">
-                                    <span className="font-mono text-white/40 block mb-1 uppercase text-[10px]">Reputation Markers</span>
+                                    <span className="font-mono text-muted-foreground/40 block mb-1 uppercase text-[10px]">Reputation Markers</span>
                                     <p className="text-[10px] text-muted-foreground italic">
                                         is_vpn, is_proxy, is_tor, is_botnet_node, is_spam_source
                                     </p>

@@ -54,6 +54,10 @@ export default {
         warning: "hsl(var(--warning))",
         danger: "hsl(var(--danger))",
         info: "hsl(var(--info))",
+        "app-bg": "hsl(var(--app-bg))",
+        "panel-bg": "hsl(var(--panel-bg))",
+        "terminal-bg": "hsl(var(--terminal-bg))",
+        "panel-border": "hsl(var(--panel-border))",
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,22 +1,36 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Meta from "@/components/Meta";
 import { Shield, Target, Users, Globe, Zap, Database, Lock, Eye } from "lucide-react";
 
 const About = () => {
+    const aboutJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "RiskSignal",
+        "url": "https://risksignal-tau.vercel.app/about",
+        "logo": "https://risksignal-tau.vercel.app/favicon.png",
+        "description": "High-fidelity IP intelligence and network analysis platform for security professionals."
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
+            <Meta
+                title="About RiskSignal Intelligence"
+                description="Learn about the engine behind RiskSignal. We provide high-fidelity IP intelligence audits and infrastructure intelligence for developers and security teams."
+                keywords="RiskSignal Mission, IP Intelligence Technology, Cyber Threat Detection, Security Infrastructure Company"
+                jsonLd={aboutJsonLd}
+            />
             <Header />
 
             <main className="pt-24 pb-20 container max-w-4xl px-4">
                 <div className="space-y-16">
-                    {/* Hero Section */}
                     <div className="space-y-6 text-center lg:text-left">
                         <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
-                            Intelligence for the <span className="text-gradient">Modern Web.</span>
+                            Modern <span className="text-gradient">Intelligence.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                            RiskSignal was built to bridge the gap between simple IP lookups and deep infrastructure intelligence.
-                            We specialize in detecting the sophisticated ways actors hide their digital footprint.
+                            RiskSignal provides deep infrastructure intelligence to help developers and security teams understand who is connecting to their systems.
                         </p>
                     </div>
 
@@ -27,11 +41,10 @@ const About = () => {
                                 <Target className="w-4 h-4" />
                                 Our Mission
                             </div>
-                            <h2 className="text-3xl font-bold">Defending Digital Borders.</h2>
+                            <h2 className="text-3xl font-bold">Better Data for Everyone.</h2>
                             <p className="text-muted-foreground leading-relaxed">
-                                Our goal is to provide developers and security teams with the highest fidelity IP intelligence
-                                available. We believe that security shouldn't be a "black box"—transparency in how we score risk
-                                is core to our philosophy.
+                                Our goal is to provide developers with high-fidelity IP intelligence without the complexity.
+                                We believe in transparency and providing actionable insights rather than cryptic scores.
                             </p>
                         </div>
                         <div className="bg-success/5 border border-success/20 rounded-2xl p-8 relative overflow-hidden group">
@@ -84,8 +97,8 @@ const About = () => {
                                 <Database className="w-6 h-6 text-foreground" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold">The RiskSignal Engine</h2>
-                                <p className="text-sm text-muted-foreground">Derived intelligence from 5+ core providers</p>
+                                <h2 className="text-2xl font-bold">How it Works</h2>
+                                <p className="text-sm text-muted-foreground">Multiple data sources, one simple API</p>
                             </div>
                         </div>
 
