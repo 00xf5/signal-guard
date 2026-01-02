@@ -117,7 +117,7 @@ const Discovery = () => {
             const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query.trim());
             const type = isIp ? 'ip' : 'domain';
 
-            const { data, error } = await supabase.functions.invoke('analyze', {
+            const { data, error } = await supabase.functions.invoke('analy', {
                 body: { query: query.trim(), type }
             });
 
