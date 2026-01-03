@@ -2,10 +2,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Shield, Lock, Eye, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import Meta from "@/components/Meta";
 
 const Privacy = () => {
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
+            <Meta
+                title="Privacy Policy & Data Protection"
+                description="Our commitment to privacy and data security. Learn how RiskSignal handles IP intelligence telemetry and system logs."
+                keywords="Privacy Policy, Data Security, IP Intelligence Privacy, RiskSignal Terms"
+            />
             <Header />
 
             <main className="pt-24 pb-20 container max-w-4xl px-4">

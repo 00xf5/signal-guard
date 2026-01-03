@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Meta from "@/components/Meta";
+import IntelTacticalSidebar from "@/components/IntelTacticalSidebar";
 
 const MapVisual = ({ lat, lng }: { lat: number, lng: number }) => {
     // Check if we have valid coordinates (0,0 is usually a failure in IP geo APIs)
@@ -77,20 +78,25 @@ const MetadataSection = ({ title, icon: Icon, children }: any) => (
     </div>
 );
 
-const DataRow = ({ label, value, copyable = false }: { label: string, value: any, copyable?: boolean }) => {
+const DataRow = ({ label, value, copyable = false, onClick, icon: Icon }: { label: string, value: any, copyable?: boolean, onClick?: () => void, icon?: any }) => {
     if (!value || value === 'Unknown' || value === '??' || value === 0 || value === 'unknown') return null;
 
-    const handleCopy = () => {
+    const handleCopy = (e: React.MouseEvent) => {
+        e.stopPropagation();
         navigator.clipboard.writeText(String(value));
         toast.success(`Copied ${label}`);
     };
 
     return (
-        <div className="flex items-baseline justify-between group">
+        <div
+            className={`flex items-baseline justify-between group ${onClick ? 'cursor-pointer hover:text-info transition-colors' : ''}`}
+            onClick={onClick}
+        >
             <span className="text-[10px] text-muted-foreground font-mono uppercase">{label}</span>
-            <div className="flex items-center gap-2 max-w-[70%]">
-                <span className="text-[10px] text-foreground font-mono text-right break-all">{value}</span>
-                {copyable && (
+            <div className="flex items-center gap-2 max-w-[70%] text-right justify-end">
+                <span className="text-[10px] text-foreground font-mono break-all group-hover:text-info transition-colors">{value}</span>
+                {Icon && <Icon className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-all text-info" />}
+                {copyable && !onClick && (
                     <button onClick={handleCopy} className="opacity-0 group-hover:opacity-100 transition-opacity">
                         <Copy className="w-2.5 h-2.5 text-info/50 hover:text-info" />
                     </button>
@@ -108,6 +114,7 @@ const IntelDetailed = () => {
     const [subnetIps, setSubnetIps] = useState<string[]>([]);
     const [activeTab, setActiveTab] = useState('services');
     const [expandedService, setExpandedService] = useState<number | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const intelJsonLd = {
         "@context": "https://schema.org",
@@ -294,8 +301,18 @@ const IntelDetailed = () => {
                                 </h3>
                                 <MapVisual lat={data?.geo_location?.coordinates?.latitude} lng={data?.geo_location?.coordinates?.longitude} />
                                 <div className="space-y-3">
-                                    <DataRow label="Country" value={data?.geo_location?.country} />
-                                    <DataRow label="City" value={data?.geo_location?.city} />
+                                    <DataRow
+                                        label="Country"
+                                        value={data?.geo_location?.country}
+                                        icon={Globe}
+                                        onClick={() => navigate(`/explorer?filter=country&value=${data?.geo_location?.country}`)}
+                                    />
+                                    <DataRow
+                                        label="City"
+                                        value={data?.geo_location?.city}
+                                        icon={MapPin}
+                                        onClick={() => navigate(`/explorer?filter=city&value=${data?.geo_location?.city}`)}
+                                    />
                                     <DataRow label="Region" value={data?.geo_location?.region} />
                                 </div>
                             </div>
@@ -306,8 +323,18 @@ const IntelDetailed = () => {
                                     <Database className="w-3.5 h-3.5 text-info" /> Network Info
                                 </h3>
                                 <div className="space-y-3">
-                                    <DataRow label="ISP" value={data?.network_context?.asn?.isp} />
-                                    <DataRow label="ASN" value={data?.network_context?.asn?.number} />
+                                    <DataRow
+                                        label="ISP"
+                                        value={data?.network_context?.asn?.isp}
+                                        icon={Search}
+                                        onClick={() => navigate(`/explorer?filter=isp&value=${data?.network_context?.asn?.isp}`)}
+                                    />
+                                    <DataRow
+                                        label="ASN"
+                                        value={data?.network_context?.asn?.number}
+                                        icon={Network}
+                                        onClick={() => navigate(`/explorer?filter=asn&value=${data?.network_context?.asn?.number}`)}
+                                    />
                                     <DataRow label="Org" value={data?.network_context?.asn?.organization} />
                                     <DataRow label="Type" value={data?.network_context?.infrastructure?.type} />
                                 </div>
@@ -495,7 +522,7 @@ const IntelDetailed = () => {
                         </div>
 
                         {/* INTERACTIVE NAVIGATION */}
-                        <div className="px-10 flex items-center gap-10 border-b border-panel-border bg-app-bg sticky top-[120px] z-30">
+                        <div className="px-6 md:px-10 flex items-center gap-4 md:gap-10 border-b border-panel-border bg-app-bg sticky top-[120px] z-30 overflow-x-auto no-scrollbar whitespace-nowrap">
                             {[
                                 { id: 'services', label: 'Ports & Protocols', icon: Layers },
                                 { id: 'vulnerabilities', label: 'Vulnerability Matrix', icon: Zap },
@@ -505,7 +532,7 @@ const IntelDetailed = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`py-6 text-[10px] font-mono uppercase tracking-[0.2em] flex items-center gap-2.5 border-b-2 transition-all group ${activeTab === tab.id
+                                    className={`py-4 md:py-6 text-[10px] font-mono uppercase tracking-[0.2em] flex items-center gap-2.5 border-b-2 transition-all group shrink-0 ${activeTab === tab.id
                                         ? 'border-info text-info font-black'
                                         : 'border-transparent text-muted-foreground hover:text-foreground/80'
                                         }`}
@@ -603,9 +630,29 @@ const IntelDetailed = () => {
 
                                                                 {p.metadata?.ssh && (
                                                                     <MetadataSection title="SSH Info" icon={Key}>
-                                                                        <DataRow label="Print" value={p.metadata.ssh.fingerprint} copyable />
+                                                                        <DataRow
+                                                                            label="Print"
+                                                                            value={p.metadata.ssh.fingerprint}
+                                                                            icon={Search}
+                                                                            onClick={() => navigate(`/explorer?filter=fingerprint&value=${p.metadata.ssh.fingerprint}`)}
+                                                                        />
                                                                         <DataRow label="Type" value={p.metadata.ssh.key_type} />
                                                                         <DataRow label="Kex" value={p.metadata.ssh.kex_algorithms[0]} />
+                                                                    </MetadataSection>
+                                                                )}
+
+                                                                {p.metadata?.rdp && (
+                                                                    <MetadataSection title="RDP Info" icon={Monitor}>
+                                                                        <DataRow label="OS" value={p.metadata.rdp.os} />
+                                                                        <DataRow label="NLA" value={p.metadata.rdp.nla} />
+                                                                        <DataRow label="Issuer" value={p.metadata.rdp.cert_issuer} />
+                                                                    </MetadataSection>
+                                                                )}
+
+                                                                {p.metadata?.http && (
+                                                                    <MetadataSection title="HTTP Info" icon={Globe}>
+                                                                        <DataRow label="Title" value={p.metadata.http.title} />
+                                                                        <DataRow label="Robots" value={p.metadata.http.robots} />
                                                                     </MetadataSection>
                                                                 )}
                                                             </div>
@@ -638,20 +685,36 @@ const IntelDetailed = () => {
                                                             <div>
                                                                 <span className="text-sm font-black text-foreground group-hover:text-info transition-colors">{v.id}</span>
                                                                 <p className="text-xs text-muted-foreground mt-2 max-w-xl leading-relaxed">{v.summary}</p>
-                                                                <div className="mt-4 flex gap-3">
+                                                                <div className="mt-4 flex flex-wrap gap-3">
                                                                     <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Affected_Version: Generic</span>
                                                                     <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Vect: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span>
+                                                                    {v.exploit_db_id && (
+                                                                        <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[9px] font-mono uppercase text-red-500 font-black animate-pulse">Weaponized_Exploit_Found</span>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <a
-                                                            href={v.link}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="p-4 bg-terminal-bg rounded-2xl hover:bg-info text-muted-foreground/80 hover:text-black transition-all"
-                                                        >
-                                                            <LinkIcon className="w-5 h-5" />
-                                                        </a>
+                                                        <div className="flex items-center gap-4">
+                                                            {v.exploit_db_id && (
+                                                                <a
+                                                                    href={`https://www.exploit-db.com/exploits/${v.exploit_db_id}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex flex-col items-center justify-center p-3 bg-red-500/10 border border-red-500/20 rounded-2xl hover:bg-red-500/20 transition-all group/edb"
+                                                                >
+                                                                    <div className="text-[10px] font-black text-red-500 uppercase font-mono mb-1">EDB-ID</div>
+                                                                    <div className="text-sm font-bold text-red-400 group-hover/edb:text-white transition-colors">#{v.exploit_db_id}</div>
+                                                                </a>
+                                                            )}
+                                                            <a
+                                                                href={v.link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="p-4 bg-terminal-bg rounded-2xl hover:bg-info text-muted-foreground/80 hover:text-black transition-all"
+                                                            >
+                                                                <LinkIcon className="w-5 h-5" />
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))
@@ -740,15 +803,19 @@ const IntelDetailed = () => {
                                         {(data?.technical?.tech_stack?.length > 0) && (
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                                 {(data?.technical?.tech_stack || []).map((tech: any, i: number) => (
-                                                    <div key={i} className="p-6 bg-terminal-bg/20 border border-panel-border rounded-2xl hover:bg-terminal-bg/40 transition-all flex items-center gap-4 text-foreground">
-                                                        <div className="w-10 h-10 bg-info/5 rounded-xl flex items-center justify-center text-info">
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => navigate(`/explorer?filter=tech&value=${tech.name}`)}
+                                                        className="p-6 bg-terminal-bg/20 border border-panel-border rounded-2xl hover:bg-terminal-bg/40 hover:border-info/30 transition-all flex items-center gap-4 text-foreground text-left group"
+                                                    >
+                                                        <div className="w-10 h-10 bg-info/5 rounded-xl flex items-center justify-center text-info group-hover:scale-110 transition-transform">
                                                             <Chip className="w-5 h-5" />
                                                         </div>
                                                         <div>
                                                             <div className="text-[10px] text-muted-foreground/80 font-mono uppercase tracking-widest mb-1">{tech.type}</div>
-                                                            <div className="text-sm font-bold text-foreground">{tech.name}</div>
+                                                            <div className="text-sm font-bold text-foreground group-hover:text-info transition-colors">{tech.name}</div>
                                                         </div>
-                                                    </div>
+                                                    </button>
                                                 ))}
                                             </div>
                                         )}
@@ -778,11 +845,11 @@ const IntelDetailed = () => {
                                                 <span>HTTP Response Headers</span>
                                                 <Radio className="w-3.5 h-3.5" />
                                             </div>
-                                            <div className="p-10 overflow-x-auto custom-scrollbar">
+                                            <div className="p-4 md:p-10 overflow-x-auto custom-scrollbar">
                                                 <div className="space-y-6">
                                                     {Object.entries(data?.technical?.all_headers || {}).map(([k, v]: [string, any]) => (
-                                                        <div key={k} className="grid grid-cols-[200px_1fr] gap-10">
-                                                            <span className="text-muted-foreground/80 font-black uppercase text-[10px] tracking-widest break-all border-r border-panel-border">
+                                                        <div key={k} className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-2 md:gap-10">
+                                                            <span className="text-muted-foreground/80 font-black uppercase text-[10px] tracking-widest break-all md:border-r border-panel-border">
                                                                 {k}
                                                             </span>
                                                             <span className="text-info/80 break-all text-xs font-medium italic">
@@ -802,6 +869,20 @@ const IntelDetailed = () => {
             </main>
 
             <Footer />
+
+            <IntelTacticalSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                data={data}
+            />
+
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-info text-app-bg rounded-full shadow-[0_0_30px_rgba(30,144,255,0.3)] flex items-center justify-center z-[90] active:scale-95 transition-transform border-4 border-background"
+            >
+                <Terminal className="w-6 h-6" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-background animate-pulse" />
+            </button>
         </div>
     );
 };

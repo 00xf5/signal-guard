@@ -13,6 +13,8 @@ import ThreatMap from "@/components/ThreatMap";
 import { useThreatFeed } from "@/hooks/useThreatFeed";
 import Meta from "@/components/Meta";
 import { motion, AnimatePresence } from "framer-motion";
+import DiscoveryTacticalSidebar from "@/components/DiscoveryTacticalSidebar";
+import { Terminal as TerminalIcon } from "lucide-react";
 
 const Discovery = () => {
     const [query, setQuery] = useState("");
@@ -23,6 +25,8 @@ const Discovery = () => {
     const [isVerifyingHuman, setIsVerifyingHuman] = useState(false);
     const [needsHumanVerification, setNeedsHumanVerification] = useState(false);
     const turnstileWidgetId = useRef<string | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const { events, stats } = useThreatFeed();
 
     const discoveryJsonLd = {
@@ -38,11 +42,18 @@ const Discovery = () => {
     useEffect(() => {
         const savedResult = sessionStorage.getItem('last_scan_result');
         const savedQuery = sessionStorage.getItem('last_scan_query');
+        const savedHistory = localStorage.getItem('discovery_search_history');
+
         if (savedResult) {
             try {
                 setResult(JSON.parse(savedResult));
                 if (savedQuery) setQuery(savedQuery);
             } catch (e) { console.error("Restore state failed", e); }
+        }
+
+        if (savedHistory) {
+            try { setSearchHistory(JSON.parse(savedHistory)); }
+            catch (e) { console.error("Failed to load history", e); }
         }
     }, []);
 
@@ -123,12 +134,31 @@ const Discovery = () => {
 
             if (error) throw error;
             setResult(data);
+
+            // Update History
+            const cleanQuery = query.trim();
+            const updatedHistory = [cleanQuery, ...searchHistory.filter(h => h !== cleanQuery)].slice(0, 10);
+            setSearchHistory(updatedHistory);
+            localStorage.setItem('discovery_search_history', JSON.stringify(updatedHistory));
         } catch (error) {
             console.error("Analysis failed:", error);
             toast.error("Failed to analyze target. Please try again.");
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleHistorySearch = (query: string) => {
+        setQuery(query);
+        // We'll trigger the search in a brief timeout to ensure state has updated if needed, 
+        // though handleSearch will use the local query if we call it directly with an event.
+        // Actually, let's just make a refined search function or call a version of it.
+        const mockEvent = { preventDefault: () => { } } as React.FormEvent;
+        // Small delay to ensure state setQuery is visible if we were to use the state query
+        setTimeout(() => {
+            const formElement = document.querySelector('form');
+            if (formElement) formElement.requestSubmit();
+        }, 100);
     };
 
     const getRiskColor = (level: string) => {
@@ -514,6 +544,22 @@ const Discovery = () => {
 
             </main>
             <Footer />
+
+            <DiscoveryTacticalSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                history={searchHistory}
+                onHistoryClick={handleHistorySearch}
+                stats={stats}
+            />
+
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="fixed bottom-6 left-6 lg:hidden w-14 h-14 bg-success text-black rounded-full shadow-[0_0_30px_rgba(34,197,94,0.3)] flex items-center justify-center z-[90] active:scale-95 transition-transform border-4 border-background"
+            >
+                <TerminalIcon className="w-6 h-6" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-info rounded-full border-2 border-background animate-pulse" />
+            </button>
         </div>
     );
 };

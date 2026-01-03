@@ -8,6 +8,7 @@ interface MetaProps {
     canonical?: string;
     type?: "website" | "article" | "profile";
     jsonLd?: object;
+    noindex?: boolean;
 }
 
 const Meta = ({
@@ -15,10 +16,13 @@ const Meta = ({
     description,
     keywords,
     image = "/og-image.png",
-    canonical = "https://risksignal-tau.vercel.app/",
+    canonical,
     type = "website",
-    jsonLd
+    jsonLd,
+    noindex
 }: MetaProps) => {
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : "https://risksignal-tau.vercel.app/";
+    const fullCanonical = canonical || currentUrl;
     const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — IP Intelligence & Reputation Audit";
     const fullDescription = description || "Comprehensive IP risk scoring, real-time port scanning, and vulnerability intelligence. Detect VPN, Proxy, and Tor infrastructure instantly.";
     const fullKeywords = keywords || "IP WHOIS, Port Scanner Online, DMARC Validator, IP Reputation, VPN Detection, Threat Intelligence, CVE Lookup, Blacklist Checker";
@@ -30,18 +34,19 @@ const Meta = ({
             <meta name="title" content={fullTitle} />
             <meta name="description" content={fullDescription} />
             <meta name="keywords" content={fullKeywords} />
-            <link rel="canonical" href={canonical} />
+            <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
+            <link rel="canonical" href={fullCanonical} />
 
             {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
-            <meta property="og:url" content={canonical} />
+            <meta property="og:url" content={fullCanonical} />
             <meta property="og:title" content={fullTitle} />
             <meta property="og:description" content={fullDescription} />
             <meta property="og:image" content={image} />
 
             {/* Twitter */}
             <meta property="twitter:card" content="summary_large_image" />
-            <meta property="twitter:url" content={canonical} />
+            <meta property="twitter:url" content={fullCanonical} />
             <meta property="twitter:title" content={fullTitle} />
             <meta property="twitter:description" content={fullDescription} />
             <meta property="twitter:image" content={image} />

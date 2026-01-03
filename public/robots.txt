@@ -7,8 +7,9 @@ Disallow: /static/
 
 Sitemap: https://risksignal-tau.vercel.app/sitemap.xml
 
-Disallow: /*/detailed
-Disallow: /*/reputation
+# Allow tools to be indexed to gain search visibility
+Allow: /*/detailed
+Allow: /*/reputation
 
 # But allow the parent tools to be indexed
 Allow: /discovery

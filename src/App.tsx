@@ -13,6 +13,7 @@ import About from "@/pages/About";
 import Discovery from "@/pages/Discovery";
 import IntelDetailed from "@/pages/IntelDetailed";
 import ReputationDetailed from "@/pages/ReputationDetailed";
+import Explorer from "@/pages/Explorer";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/about" element={<About />} />
             <Route path="/discovery" element={<Discovery />} />
+            <Route path="/explorer" element={<Explorer />} />
             <Route path="/:query/detailed" element={<IntelDetailed />} />
             <Route path="/:query/reputation" element={<ReputationDetailed />} />
             <Route path="*" element={<NotFound />} />

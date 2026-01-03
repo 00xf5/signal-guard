@@ -9,6 +9,7 @@ import Philosophy from "@/components/Philosophy";
 import SEOContent from "@/components/SEOContent";
 import Footer from "@/components/Footer";
 import Meta from "@/components/Meta";
+import DiscoveryPreview from "@/components/DiscoveryPreview";
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
       <ThemeToggle />
       <main className="pt-14">
         <Hero />
+        <DiscoveryPreview />
         <AccessCTA />
         <Features />
         <Scoring />

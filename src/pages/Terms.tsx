@@ -2,10 +2,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FileText, Scale, Zap, AlertTriangle, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import Meta from "@/components/Meta";
 
 const Terms = () => {
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
+            <Meta
+                title="Terms of Service"
+                description="Terms and conditions for using the RiskSignal IP intelligence platform and API. Understand our usage limits and service level agreements."
+                keywords="Terms of Service, RiskSignal Terms, Usage Policy, API Agreement"
+            />
             <Header />
 
             <main className="pt-24 pb-20 container max-w-4xl px-4">

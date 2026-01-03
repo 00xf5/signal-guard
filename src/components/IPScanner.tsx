@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -546,7 +547,18 @@ const IPScanner = () => {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-bold text-lg tracking-tight">{ipData.ip}</span>
+                                            <div className="group/ip relative">
+                                                <Link
+                                                    to={`/${ipData.ip}/detailed`}
+                                                    className="font-bold text-lg tracking-tight hover:text-info transition-colors flex items-center gap-1.5"
+                                                >
+                                                    {ipData.ip}
+                                                    <Zap className="w-3 h-3 text-info opacity-0 group-hover/ip:opacity-100 transition-all group-hover/ip:scale-110" />
+                                                </Link>
+                                                <div className="absolute -top-8 left-0 scale-0 group-hover/ip:scale-100 transition-all origin-bottom bg-info text-black text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest whitespace-nowrap z-50">
+                                                    Deep Intel Available →
+                                                </div>
+                                            </div>
                                             <span className={`text-[10px] uppercase px-1.5 py-0.5 border font-semibold ${getThreatBadgeStyle(ipData.threatLevel)}`}>
                                                 {ipData.threatLevel} risk
                                             </span>
