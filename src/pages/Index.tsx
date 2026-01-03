@@ -15,7 +15,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Meta
-        title="Pro IP Intelligence & Anonymity Detection"
+        title="IP Intelligence & Anonymity Detection"
         description="Real-time IP risk scoring, VPN detection, and forensic network intelligence. Audit any IP or domain with the high-fidelity RiskSignal engine."
         keywords="IP intelligence, VPN detection, proxy detection, threat intelligence, risk scoring, anonymity detection, Tor detection, RiskSignal"
       />

@@ -16,6 +16,8 @@ import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Meta from "@/components/Meta";
 import IntelTacticalSidebar from "@/components/IntelTacticalSidebar";
+import { AsmService } from "@/lib/asm-service";
+import { classifyExposure } from "@/lib/taxonomy";
 
 const MapVisual = ({ lat, lng }: { lat: number, lng: number }) => {
     // Check if we have valid coordinates (0,0 is usually a failure in IP geo APIs)
@@ -146,6 +148,67 @@ const IntelDetailed = () => {
                     range.push(`${prefix}.${i}`);
                 }
                 setSubnetIps(range);
+            }
+
+            // === ASM CORE INTEGRATION ===
+            if (intelData && query) {
+                const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query);
+                const rootDomain = !isIp ? query.split('.').slice(-2).join('.') : null;
+
+                if (rootDomain || isIp) {
+                    const orgName = rootDomain ? rootDomain.split('.')[0] : (intelData.geo_location?.org || query);
+                    const org = await AsmService.getOrCreateOrganization(rootDomain || query, orgName);
+                    if (org) {
+                        // 1. Track the primary asset
+                        const assetId = await AsmService.trackAsset({
+                            org_id: org.id,
+                            asset_type: isIp ? 'ip' : 'domain',
+                            value: query,
+                            ownership_confidence: 100,
+                            metadata_json: { forensic_query: query }
+                        });
+
+                        // 2. Track and link the resolved IP if it's a domain
+                        if (assetId && !isIp && intelData.network_context?.resolved_ip) {
+                            const ipAssetId = await AsmService.trackAsset({
+                                org_id: org.id,
+                                asset_type: 'ip',
+                                value: intelData.network_context.resolved_ip,
+                                ownership_confidence: 100,
+                                metadata_json: { ip: intelData.network_context.resolved_ip }
+                            });
+                            if (ipAssetId) {
+                                await AsmService.linkAssets(assetId, ipAssetId, 'hosted_on');
+                            }
+                        }
+
+                        // 3. Subnet Expansion (Phase F)
+                        if (isIp && assetId) {
+                            await AsmService.performSubnetScan(org.id, query);
+                        }
+
+                        // 4. Discover Related Artifacts
+                        if (assetId) {
+                            await AsmService.discoverRelatedArtifacts(org.id, intelData, assetId);
+                        }
+
+                        // 4. Record Forensic Exposures
+                        (intelData.technical?.ports || []).forEach(async (p: any) => {
+                            const taxonomy = classifyExposure(p.port, p.banner, intelData.technical);
+                            if (taxonomy) {
+                                await AsmService.recordExposure({
+                                    asset_id: assetId,
+                                    taxonomy_id: taxonomy.id,
+                                    severity: taxonomy.severity,
+                                    confidence: 100,
+                                    status: 'detected',
+                                    description: taxonomy.description,
+                                    remediation_steps: taxonomy.remediation
+                                });
+                            }
+                        });
+                    }
+                }
             }
         } catch (err) {
             console.error("Deep intel failed:", err);
@@ -415,6 +478,26 @@ const IntelDetailed = () => {
 
                     {/* Main Content */}
                     <div className="bg-app-bg overflow-y-auto custom-scrollbar relative">
+                        {/* Forensic Verdict Banner */}
+                        {data?.summary?.forensic_verdict === "DIRECT_ORIGIN_EXPOSURE" && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                className="bg-red-500/10 border-b border-red-500/30 px-10 py-4 flex items-center justify-between"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-red-500 text-black rounded-xl flex items-center justify-center animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                                        <ShieldAlert className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-red-500 font-black text-xs uppercase tracking-widest">CRITICAL_FORENSIC_VERDICT</h3>
+                                        <p className="text-[10px] text-red-500/80 font-mono">DIRECT_ORIGIN_EXPOSURE_DETECTED: Backend infrastructure reachable without WAF/CDN arbitration.</p>
+                                    </div>
+                                </div>
+                                <div className="text-[10px] font-mono text-red-500/40 uppercase">Class: EXP-INF-WAF-BYPASS</div>
+                            </motion.div>
+                        )}
+
                         <div className="p-10 border-b border-panel-border bg-panel-bg/50 grid-bg">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                                 {/* RISK SCORE ENGINE */}
@@ -618,8 +701,8 @@ const IntelDetailed = () => {
 
                                                                 {p.metadata?.tls && (
                                                                     <MetadataSection title="TLS Info" icon={Lock}>
-                                                                        <DataRow label="Subject" value={p.metadata.tls.subject.common_name} copyable />
-                                                                        <DataRow label="Issuer" value={p.metadata.tls.issuer.common_name} />
+                                                                        <DataRow label="Subject" value={p.metadata.tls.subject?.common_name} copyable />
+                                                                        <DataRow label="Issuer" value={p.metadata.tls.issuer?.common_name} />
                                                                         <DataRow label="Version" value={p.metadata.tls.version} />
                                                                         <DataRow label="Cipher" value={p.metadata.tls.cipher} />
                                                                         <div className="text-[9px] text-emerald-500/60 font-mono mt-2 flex items-center gap-2">
@@ -637,7 +720,7 @@ const IntelDetailed = () => {
                                                                             onClick={() => navigate(`/explorer?filter=fingerprint&value=${p.metadata.ssh.fingerprint}`)}
                                                                         />
                                                                         <DataRow label="Type" value={p.metadata.ssh.key_type} />
-                                                                        <DataRow label="Kex" value={p.metadata.ssh.kex_algorithms[0]} />
+                                                                        <DataRow label="Kex" value={p.metadata.ssh.kex_algorithms?.[0]} />
                                                                     </MetadataSection>
                                                                 )}
 

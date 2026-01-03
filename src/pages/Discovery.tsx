@@ -15,6 +15,8 @@ import Meta from "@/components/Meta";
 import { motion, AnimatePresence } from "framer-motion";
 import DiscoveryTacticalSidebar from "@/components/DiscoveryTacticalSidebar";
 import { Terminal as TerminalIcon } from "lucide-react";
+import { AsmService } from "@/lib/asm-service";
+import { classifyExposure } from "@/lib/taxonomy";
 
 const Discovery = () => {
     const [query, setQuery] = useState("");
@@ -128,12 +130,82 @@ const Discovery = () => {
             const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query.trim());
             const type = isIp ? 'ip' : 'domain';
 
-            const { data, error } = await supabase.functions.invoke('analy', {
+            const { data, error } = await supabase.functions.invoke('deep-intel', {
                 body: { query: query.trim(), type }
             });
 
             if (error) throw error;
             setResult(data);
+
+            // === ASM CORE INTEGRATION ===
+            // 1. Determine root domain for Org tracking
+            const rootDomain = type === 'domain' ? query.trim().split('.').slice(-2).join('.') : null;
+
+            if (rootDomain) {
+                const org = await AsmService.getOrCreateOrganization(rootDomain);
+                if (org) {
+                    // 2. Track the target asset
+                    const assetId = await AsmService.trackAsset({
+                        org_id: org.id,
+                        asset_type: type,
+                        value: query.trim(),
+                        ownership_confidence: 100,
+                        metadata_json: { target: query.trim() }
+                    });
+
+                    if (assetId && data.network_context?.resolved_ip) {
+                        // 3. Track the IP asset
+                        const ipAssetId = await AsmService.trackAsset({
+                            org_id: org.id,
+                            asset_type: 'ip',
+                            value: data.network_context.resolved_ip,
+                            ownership_confidence: 90,
+                            metadata_json: { ip: data.network_context.resolved_ip }
+                        });
+
+                        if (ipAssetId) {
+                            // 4. Link Domain -> IP
+                            await AsmService.linkAssets(assetId, ipAssetId, 'hosted_on');
+                        }
+                    }
+
+                    // 4. Discover Related Artifacts
+                    if (assetId) {
+                        await AsmService.discoverRelatedArtifacts(org.id, data, assetId);
+                    }
+
+                    // 5. Use Taxonomy to classify exposures (General & Taxonomy-based)
+                    if (assetId) {
+                        // Check for specific exposures based on services
+                        (data.technical?.ports || []).forEach(async (p: any) => {
+                            const taxonomy = classifyExposure(p.port, p.banner, data.technical);
+                            if (taxonomy) {
+                                await AsmService.recordExposure({
+                                    asset_id: assetId,
+                                    taxonomy_id: taxonomy.id,
+                                    severity: taxonomy.severity,
+                                    confidence: 100,
+                                    status: 'detected',
+                                    description: taxonomy.description,
+                                    remediation_steps: taxonomy.remediation
+                                });
+                            }
+                        });
+
+                        // Fallback general risk if score is high
+                        if (data.summary?.risk_score > 60) {
+                            await AsmService.recordExposure({
+                                asset_id: assetId,
+                                taxonomy_id: 'EXP-GEN-RISK',
+                                severity: data.summary.risk_level,
+                                confidence: 80,
+                                status: 'detected'
+                            });
+                        }
+                    }
+                }
+            }
+            // === END ASM INTEGRATION ===
 
             // Update History
             const cleanQuery = query.trim();
