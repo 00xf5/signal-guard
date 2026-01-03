@@ -20,48 +20,62 @@ export const AsmService = {
      * Initializes or retrieves an organization based on its root domain.
      */
     async getOrCreateOrganization(rootDomain: string, name?: string): Promise<Organization | null> {
-        const { data, error } = await supabase
-            .from('organizations')
-            .select('*')
-            .eq('root_domain', rootDomain)
-            .single();
+        // Helper to race against 5s timeout
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('DB_TIMEOUT')), 5000));
 
-        if (error && error.code === 'PGRST116') {
-            // Not found, create it
-            const { data: newOrg, error: createError } = await supabase
+        try {
+            const fetchOp = supabase
                 .from('organizations')
-                .insert([{
-                    name: name || rootDomain.split('.')[0].toUpperCase(),
-                    root_domain: rootDomain
-                }])
-                .select()
+                .select('*')
+                .eq('root_domain', rootDomain)
                 .single();
 
-            if (createError) {
-                console.error('Failed to create organization:', createError);
-                return null;
-            }
-            return newOrg;
-        }
+            const { data, error } = await Promise.race([fetchOp, timeout]) as any;
 
-        return data;
+            if (error && error.code === 'PGRST116') {
+                // Not found, create it
+                const insertOp = supabase
+                    .from('organizations')
+                    .insert([{
+                        name: name || rootDomain.split('.')[0].toUpperCase(),
+                        root_domain: rootDomain
+                    }])
+                    .select()
+                    .single();
+
+                const { data: newOrg, error: createError } = await Promise.race([insertOp, timeout]) as any;
+
+                if (createError) {
+                    console.error('Failed to create organization:', createError);
+                    return null;
+                }
+                return newOrg;
+            }
+            return data;
+        } catch (e) {
+            console.error('Organization fetch/create timed out:', e);
+            return null;
+        }
     },
 
     /**
      * Upserts an asset into the target organization.
      */
-    async trackAsset(asset: Partial<AssetBase> & { asset_type: string, org_id: string, value?: string }): Promise<string | null> {
+    async trackAsset(asset: Partial<AssetBase> & { asset_type: string, org_id: string, value: string }): Promise<string | null> {
         // 1. Create/Update Base Asset
         const baseAsset = {
             org_id: asset.org_id,
-            asset_type: asset.asset_type,
-            ownership_confidence: asset.ownership_confidence || 0,
+            type: asset.asset_type as any, // Map to asset_kind_enum
+            value: asset.value,
+            status: 'active',
+            confidence: (asset.ownership_confidence || 0) / 100,
+            last_seen: new Date().toISOString(),
             metadata_json: asset.metadata_json || {}
         };
 
         const { data, error } = await supabase
             .from('assets')
-            .upsert([baseAsset], { onConflict: 'id' })
+            .upsert([baseAsset], { onConflict: 'value' })
             .select('id')
             .single();
 
@@ -149,19 +163,31 @@ export const AsmService = {
      * Advanced pivots based on scan metadata (Passive Discovery expansion)
      */
     async discoverRelatedArtifacts(orgId: string, scanData: any, sourceAssetId: string) {
-        // 1. Link associated domains found in passive DNS
+        // 1. Link associated domains found in passive DNS (ALL, batched)
         const associatedDomains = scanData.network_context?.associated_domains || [];
-        for (const fqdn of associatedDomains) {
-            const assetId = await this.trackAsset({
-                org_id: orgId,
-                asset_type: 'domain',
-                value: fqdn,
-                ownership_confidence: this.calculateConfidence('domain', 'passive_dns'),
-                metadata_json: { discovered_via: sourceAssetId, source: 'passive_dns' }
-            });
-            if (assetId) {
-                await this.linkAssets(sourceAssetId, assetId, 'associated_with');
-            }
+
+        // Process in chunks of 5 to avoid overwhelming the connection
+        const chunkSize = 5;
+        for (let i = 0; i < associatedDomains.length; i += chunkSize) {
+            const chunk = associatedDomains.slice(i, i + chunkSize);
+            await Promise.all(chunk.map(async (fqdn: string) => {
+                try {
+                    const assetId = await this.trackAsset({
+                        org_id: orgId,
+                        asset_type: 'domain',
+                        value: fqdn,
+                        ownership_confidence: this.calculateConfidence('domain', 'passive_dns'),
+                        metadata_json: { discovered_via: sourceAssetId, source: 'passive_dns' }
+                    });
+                    if (assetId) {
+                        await this.linkAssets(sourceAssetId, assetId, 'associated_with');
+                    }
+                } catch (error) {
+                    console.error(`Failed to track subdomain ${fqdn}:`, error);
+                }
+            }));
+            // Small delay between chunks to be polite to the backend
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         // 2. Pivot on TLS SAN list if available

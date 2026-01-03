@@ -215,6 +215,30 @@ const ReputationDetailed = () => {
         );
     }
 
+    if (!data) {
+        return (
+            <div className="min-h-screen bg-app-bg flex flex-col items-center justify-center p-4">
+                <Header />
+                <div className="flex flex-col items-center gap-6 mt-20">
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                        <ShieldAlert className="w-12 h-12 text-red-500" />
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Audit Data Unavailable</h2>
+                        <p className="text-sm text-muted-foreground font-mono">The reputation engine could not retrieve data for this target.</p>
+                    </div>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="px-8 py-3 bg-foreground text-background text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all"
+                    >
+                        Back to Search
+                    </button>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+
     const trustScore = 100 - (fullIntel?.summary?.risk_score || 0);
     const getTrustColor = (score: number) => {
         if (score > 80) return "text-emerald-500";
@@ -372,7 +396,7 @@ const ReputationDetailed = () => {
                                             label="SPF Policy"
                                             status={data?.email_security?.spf === 'Missing' ? 'fail' : 'pass'}
                                         />
-                                        {data?.email_security?.spf !== 'Missing' && (
+                                        {data?.email_security?.spf && data?.email_security?.spf !== 'Missing' && (
                                             <div className="px-3 py-2 bg-terminal-bg/20 border border-panel-border rounded-lg text-[9px] font-mono text-muted-foreground break-all leading-relaxed">
                                                 {data.email_security.spf}
                                             </div>
@@ -384,7 +408,7 @@ const ReputationDetailed = () => {
                                             label="DMARC Policy"
                                             status={data?.email_security?.dmarc === 'Missing' ? 'fail' : 'pass'}
                                         />
-                                        {data?.email_security?.dmarc !== 'Missing' && (
+                                        {data?.email_security?.dmarc && data?.email_security?.dmarc !== 'Missing' && (
                                             <div className="px-3 py-2 bg-terminal-bg/20 border border-panel-border rounded-lg text-[9px] font-mono text-muted-foreground break-all leading-relaxed">
                                                 {data.email_security.dmarc}
                                             </div>

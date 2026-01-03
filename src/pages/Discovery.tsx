@@ -13,10 +13,9 @@ import ThreatMap from "@/components/ThreatMap";
 import { useThreatFeed } from "@/hooks/useThreatFeed";
 import Meta from "@/components/Meta";
 import { motion, AnimatePresence } from "framer-motion";
-import DiscoveryTacticalSidebar from "@/components/DiscoveryTacticalSidebar";
-import { Terminal as TerminalIcon } from "lucide-react";
 import { AsmService } from "@/lib/asm-service";
 import { classifyExposure } from "@/lib/taxonomy";
+import DiscoveryTimeline from "@/components/DiscoveryTimeline";
 
 const Discovery = () => {
     const [query, setQuery] = useState("");
@@ -387,79 +386,90 @@ const Discovery = () => {
                                 </div>
                             </div>
 
-                            {/* Intelligence Body */}
-                            <div className="grid lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border">
-                                {/* Column 1: Signals */}
-                                <div className="p-6 md:p-8 space-y-6">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <ShieldAlert className="w-4 h-4 text-primary" />
-                                        Signals
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {(result?.intelligence?.signals_detected || []).map((signal: string, i: number) => (
-                                            <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${signal.includes('CLEAN') || signal.includes('No Anomaly')
-                                                ? 'bg-success/5 border-success/20 text-foreground'
-                                                : 'bg-danger/5 border-danger/20 text-foreground'
-                                                }`}>
-                                                <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${signal.includes('CLEAN') ? 'bg-success' : 'bg-danger animate-pulse'
-                                                    }`} />
-                                                <span className="font-mono leading-tight">{signal}</span>
-                                            </div>
-                                        ))}
+                            {/* Analysis Body: Timeline-First Architecture */}
+                            <div className="grid lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border bg-black/20">
+                                {/* MAIN TIMELINE (2/3) */}
+                                <div className="lg:col-span-2 p-6 md:p-8 space-y-6 overflow-hidden">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="flex items-center gap-2 text-sm font-black text-foreground uppercase tracking-widest">
+                                            <Clock className="w-4 h-4 text-info" />
+                                            Target Timeline
+                                        </h3>
+                                        <div className="px-2 py-0.5 rounded bg-info/10 border border-info/20 text-[10px] font-mono text-info">
+                                            REAL-TIME FORENSICS
+                                        </div>
                                     </div>
+
+                                    <DiscoveryTimeline
+                                        version={result?.snapshot_version || 1}
+                                        changes={result?.changes || []}
+                                        findings={result?.risk_findings || []}
+                                    />
                                 </div>
 
-                                {/* Column 2: Network Context */}
-                                <div className="p-6 md:p-8 space-y-6">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <Activity className="w-4 h-4 text-primary" />
-                                        Network
-                                    </h3>
+                                {/* CONTEXTUAL DATA (1/3) */}
+                                <div className="p-6 md:p-8 space-y-8 bg-black/40">
+                                    {/* Tech Stack */}
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center text-sm border-b border-border pb-2">
-                                            <span className="text-muted-foreground">Resolved IP</span>
-                                            <span className="font-mono text-foreground">{result?.network_context?.resolved_ip || "N/A"}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm border-b border-border pb-2">
-                                            <span className="text-muted-foreground">Tor Exit Node</span>
-                                            <span className={`font-mono ${result?.network_context?.anonymity_detectors?.is_tor ? 'text-danger font-bold' : 'text-success'}`}>
-                                                {result?.network_context?.anonymity_detectors?.is_tor ? "DETECTED" : "CLEAN"}
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm border-b border-border pb-2">
-                                            <span className="text-muted-foreground">VPN / Proxy</span>
-                                            <span className={`font-mono ${result?.network_context?.anonymity_detectors?.is_vpn ? 'text-warning font-bold' : 'text-success'}`}>
-                                                {result?.network_context?.anonymity_detectors?.is_vpn ? "DETECTED" : "CLEAN"}
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm border-b border-border pb-2">
-                                            <span className="text-muted-foreground">Timezone</span>
-                                            <span className="font-mono text-foreground">{result?.geo_location?.timezone || "UTC"}</span>
+                                        <h3 className="flex items-center gap-2 text-xs font-black text-foreground uppercase tracking-widest opacity-60">
+                                            <Cpu className="w-4 h-4" />
+                                            Technology Stack
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {(result?.technical?.tech_stack || []).map((tech: string, i: number) => (
+                                                <span key={i} className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-foreground hover:bg-info/10 transition-colors">
+                                                    {tech}
+                                                </span>
+                                            ))}
+                                            {(!result?.technical?.tech_stack || result.technical.tech_stack.length === 0) && (
+                                                <span className="text-xs italic text-muted-foreground">None detected</span>
+                                            )}
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Column 3: Reputation Sources */}
-                                <div className="p-6 md:p-8 space-y-6">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
-                                        <Lock className="w-4 h-4 text-primary" />
-                                        Reputation
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {(result?.intelligence?.reputation_sources || []).map((src: any, i: number) => (
-                                            <div key={i} className="flex flex-col gap-1 p-3 rounded-lg bg-muted/30 border border-border hover:bg-muted/50 transition-colors">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="font-medium text-xs text-foreground">{src.source}</span>
-                                                    <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${src.status === 'clean' ? 'bg-success/10 text-success border-success/20' :
-                                                        src.status === 'flagged' ? 'bg-danger/10 text-danger border-danger/20' :
-                                                            'bg-muted text-muted-foreground border-border'
-                                                        }`}>
+                                    {/* Network Context */}
+                                    <div className="space-y-4">
+                                        <h3 className="flex items-center gap-2 text-xs font-black text-foreground uppercase tracking-widest opacity-60">
+                                            <Activity className="w-4 h-4" />
+                                            Live Network
+                                        </h3>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center text-[11px] border-b border-white/5 pb-2">
+                                                <span className="text-muted-foreground uppercase tracking-tighter">Resolved IP</span>
+                                                <span className="font-mono text-foreground font-bold">{result?.network_context?.resolved_ip || "N/A"}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] border-b border-white/5 pb-2">
+                                                <span className="text-muted-foreground uppercase tracking-tighter">WAF Profile</span>
+                                                <span className={`font-mono px-2 py-0.5 rounded text-[9px] font-black ${result?.technical?.waf?.detected ? 'bg-success/20 text-success border border-success/30' : 'bg-muted text-muted-foreground'}`}>
+                                                    {result?.technical?.waf?.detected ? result.technical.waf.provider : "DIRECT ORIGIN"}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] border-b border-white/5 pb-2">
+                                                <span className="text-muted-foreground uppercase tracking-tighter">Anonymity</span>
+                                                <span className={`font-mono text-[9px] font-black uppercase ${result?.network_context?.anonymity_detectors?.is_tor || result?.network_context?.anonymity_detectors?.is_vpn ? 'text-warning' : 'text-success'}`}>
+                                                    {result?.network_context?.anonymity_detectors?.is_tor ? 'TOR_EXIT' :
+                                                        result?.network_context?.anonymity_detectors?.is_vpn ? 'VPN_PROXY' : 'CLEAN_RESIDENTIAL'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Reputation Sources */}
+                                    <div className="space-y-4">
+                                        <h3 className="flex items-center gap-2 text-xs font-black text-foreground uppercase tracking-widest opacity-60">
+                                            <Lock className="w-4 h-4" />
+                                            Trust Nodes
+                                        </h3>
+                                        <div className="space-y-2">
+                                            {(result?.intelligence?.reputation_sources || []).map((src: any, i: number) => (
+                                                <div key={i} className="flex justify-between items-center p-2 rounded bg-white/5 border border-white/10">
+                                                    <span className="text-[10px] font-bold text-foreground truncate max-w-[100px]">{src.source}</span>
+                                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase ${src.status === 'clean' ? 'bg-success/10 text-success border-success/20' : 'bg-danger/10 text-danger border-danger/20'}`}>
                                                         {src.status}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] text-gray-400">{src.description}</span>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

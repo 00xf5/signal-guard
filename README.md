@@ -2,105 +2,81 @@
 
 [![RiskSignal Live](https://img.shields.io/badge/Live-RiskSignal-blue?style=for-the-badge)](https://risksignal-tau.vercel.app/)
 
-**RiskSignal** is a high-fidelity intelligence powerhouse built for developers, security specialists, and bug hunters. It converts raw network telemetry into actionable forensic insights, combining real-time port scanning, CVE vulnerability mapping, and **Attack Surface Management (ASM)** into a single, seamless platform.
-
-**Platform URL:** [https://risksignal-tau.vercel.app/](https://risksignal-tau.vercel.app/)
+**RiskSignal** is a high-fidelity intelligence powerhouse built for developers, security specialists, and bug hunters. It converts raw network telemetry into actionable forensic insights, combining real-time port scanning, CVE vulnerability mapping, and **Time-Aware Attack Surface Management (ASM)** into a single, seamless platform.
 
 ---
 
-## 🛰️ Core Intelligence Modules
+## 🛰️ Core Intelligence Modules (V2 Architecture)
 
-RiskSignal is architected around five distinct intelligence funnels, each optimized for specific security search intents:
+RiskSignal is built on a "Measure, Hash, Judge" cycle that identifies infrastructure changes in milliseconds.
 
-### 1. Attack Surface Management (ASM) & Asset Inventory
-A relational engine that tracks the lifecycle of infrastructure.
-- **Keywords:** *Asset Discovery, Attack Surface Reduction, Infrastructure Inventory.*
-- **Features:** Relational mapping of `Organizations -> Assets -> Exposures`, Ownership Confidence scoring, and cross-asset relationship graphing.
+### 1. Forensic ASM & Change Detection
+A state-based engine that tracks infrastructure evolution.
+- **Data Sources:** Shodan, VirusTotal, crt.sh (Certificate Transparency).
+- **How it works:** Every scan state is hashed (SHA-256). If the hash changes vs. the last scan, the system identifies the exact delta (e.g., `Port 22 Opened`) and records it in the asset's timeline.
+- **Data Source:** `crt.sh` is used to discover historical subdomains and certificate age to detect "Burner" infrastructure.
 
-### 2. Threat Discovery & Global Map
-A real-time visualizer of global threat events and botnet telemetry.
-- **Keywords:** *Live Cyber Attack Map, Botnet Tracker, Real-time Threat Intelligence.*
-- **Features:** Interactive GIS mapping, live event streaming, and ASN reputation heatmaps.
+### 2. Deep Service Fingerprinting
+Goes beyond simple port detection to identify the technical DNA of a target.
+- **Technique:** **Forensic Banner Synthesis**. If a service doesn't respond with a banner, we synthesize one from HTTP response headers (`Server`, `X-Powered-By`) and SSL handshakes.
+- **Intelligence:** Automatically maps ports to services like **OpenSSH**, **Nginx**, **MySQL**, and **LiteSpeed**.
 
-### 3. Deep Forensic Intel (Target Audit)
-A deep-dive scanner that identifies the technical DNA of any IP or Domain.
-- **Keywords:** *IP WHOIS, Port Scanner Online, Service Banner Grabbing, TLS/SSL Handshake Forensics.*
-- **Features:** Automated port discovery, CVE vulnerability cross-referencing (NVD/Exploit-DB), and infrastructure type identification (WAF vs. Hosting vs. Direct Origin).
+### 3. Heuristic Risk Engine
+Moves beyond static CVSS scores to calculate risk based on context.
+- **Logic:** 
+  - **WAF Bypass Detection:** Flags if an IP is exposed but associated with a Cloudflare/WAF-protected domain.
+  - **Fresh Infrastructure:** Automatically triggers a warning if an SSL certificate was issued in the last 72 hours.
+  - **Technology Drift:** Detects if the underlying server software has changed significantly between scans.
 
-### 4. Reputation & Compliance Dashboard
-A "super rich" audit engine for high-level trust verification and email security.
-- **Keywords:** *Blacklist Checker, DMARC Validator, SPF Record Audit, Email Security Posture.*
-- **Features:** Domain trust scoring (A-F Grade), security contact extraction, and real-time blocklist (Spamhaus/SBL) status.
-
-### 5. Developer API (Automated Risk Scoring)
-Ultra-low latency API designed for high-scale fraud prevention and bot detection.
-- **Keywords:** *VPN Detection API, Proxy Detection SDK, IP Risk Scoring, Tor Exit Node identification.*
-- **Implementation:** RESTful architecture with JSON-LD support for better machine readability.
+### 4. Reputation & Intelligence Hub
+- **Database:** VirusTotal & IPWhois.
+- **Feature:** Identifies known malicious scanners (Masscan, Shodan Bot) and checks against 70+ blocklists in real-time.
+- **Geo-Forensics:** High-precision ISP/ASN mapping and 3D coordinate visualization.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Data Source Orchestration
 
-RiskSignal utilizes a state-of-the-art stack to deliver instantaneous results with zero lag:
-
-- **Frontend:** React 18 (Vite) with **Tailwind CSS** and **Framer Motion** for a high-fidelity interactive UI.
-- **Backend:** **Supabase Edge Functions** (Deno) for global low-latency processing and fan-out scanning.
-- **Database:** **PostgreSQL (Supabase)** with an ASM-hardened schema and **Row Level Security (RLS)** for secure public data ingestion.
-- **Intelligence Engine:** Multimodal discovery via Cloudflare DNS, RDAP Registry, NVD (CVEs), and Shodan IoT cross-referencing.
-
----
-
-## 🚀 API Quick Start
-
-Integrate **RiskSignal** into your production stack in seconds.
-
-**cURL Request:**
-```bash
-curl -X GET "https://risksignal-tau.vercel.app/api/scan?ip=8.8.8.8" \
-     -H "x-api-key: YOUR_SIGNATURE_KEY"
-```
-
-**Python Implementation:**
-```python
-import requests
-
-def audit_target(target):
-    response = requests.get(
-        f"https://risksignal-tau.vercel.app/api/scan?ip={target}",
-        headers={"x-api-key": "YOUR_SIGNATURE_KEY"}
-    )
-    return response.json()
-
-print(audit_target("8.8.8.8"))
-```
+| Provider | Intelligence Role |
+| :--- | :--- |
+| **Shodan** | Global port discovery and IoT vulnerability detection. |
+| **VirusTotal** | Malware reputation and passive DNS relationships. |
+| **crt.sh** | Certificate Transparency logs for asset discovery. |
+| **IPWhois** | Real-time ASN connectivity and geographic placement. |
+| **HTTP Engine** | Headless tech-stack profiling and security header audit. |
 
 ---
 
 ## 📦 Deployment & Setup
 
-1. **Clone the Repository:**
+1. **Clone the Repo:**
    ```bash
    git clone https://github.com/00xf5/signal-guard.git
    ```
 2. **Setup Environment:**
-   Create a `.env` file with your **Vite** and **Supabase** credentials:
+   Configure your `.env` with:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_CLOUDFLARE_SITE_KEY`
-3. **Database Setup:**
-   Apply the `supabase/schema.sql` to your Supabase project to initialize the ASM relational tables and RLS policies.
-4. **Run Locally:**
+3. **Deploy Backend:**
+   RiskSignal uses **Supabase Edge Functions** (Deno) for its logic.
    ```bash
-   npm install
-   npm run dev
+   supabase functions deploy deep-intel --no-verify-jwt
+   ```
+4. **Run Application:**
+   ```bash
+   npm install && npm run dev
    ```
 
 ---
 
-## ⚖️ Privacy & Compliance
-RiskSignal is built on **Privacy-by-Design** principles. We provide high-fidelity risk metrics without storing personally identifiable information (PII) of scanned targets. 
+## 🚀 API for Developers
+Ultra-low latency API for high-scale fraud prevention.
+```bash
+curl -X POST "https://[YOUR_SUPABASE_URL]/functions/v1/deep-intel" \
+     -H "Authorization: Bearer [SERVICE_ROLE_KEY]" \
+     -d '{"query": "example.com"}'
+```
 
-- [Compliance Guide](https://risksignal-tau.vercel.app/docs)
-- [Privacy Policy](https://risksignal-tau.vercel.app/privacy)
+---
 
 © 2026 **RiskSignal Intelligence Ops.** | *Defending infrastructure at the speed of light.*

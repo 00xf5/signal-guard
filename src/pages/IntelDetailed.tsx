@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -130,13 +130,20 @@ const IntelDetailed = () => {
 
     const fetchDeepIntel = async () => {
         setIsLoading(true);
+        if (!query) {
+            toast.error("Invalid Target", { description: "The search query is missing from the URL." });
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const { data: intelData, error } = await supabase.functions.invoke('deep-intel', {
-                body: { query }
+                body: { query: query }
             });
 
             if (error) throw error;
             setData(intelData);
+            setIsLoading(false); // <--- UNBLOCK UI IMMEDIATELY
 
             const targetIp = intelData?.network_context?.resolved_ip;
             if (targetIp && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(targetIp)) {
@@ -150,76 +157,96 @@ const IntelDetailed = () => {
                 setSubnetIps(range);
             }
 
-            // === ASM CORE INTEGRATION ===
-            if (intelData && query) {
-                const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query);
-                const rootDomain = !isIp ? query.split('.').slice(-2).join('.') : null;
+            // === ASM CORE INTEGRATION (Background Task) ===
+            // We do not await this block to let the UI render
+            (async () => {
+                if (intelData && query) {
+                    const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query);
+                    const rootDomain = !isIp ? query.split('.').slice(-2).join('.') : null;
 
-                if (rootDomain || isIp) {
-                    const orgName = rootDomain ? rootDomain.split('.')[0] : (intelData.geo_location?.org || query);
-                    const org = await AsmService.getOrCreateOrganization(rootDomain || query, orgName);
-                    if (org) {
-                        // 1. Track the primary asset
-                        const assetId = await AsmService.trackAsset({
-                            org_id: org.id,
-                            asset_type: isIp ? 'ip' : 'domain',
-                            value: query,
-                            ownership_confidence: 100,
-                            metadata_json: { forensic_query: query }
-                        });
-
-                        // 2. Track and link the resolved IP if it's a domain
-                        if (assetId && !isIp && intelData.network_context?.resolved_ip) {
-                            const ipAssetId = await AsmService.trackAsset({
+                    if (rootDomain || isIp) {
+                        const orgName = rootDomain ? rootDomain.split('.')[0] : (intelData.geo_location?.org || query);
+                        const org = await AsmService.getOrCreateOrganization(rootDomain || query, orgName);
+                        if (org) {
+                            // 1. Track the primary asset
+                            const assetId = await AsmService.trackAsset({
                                 org_id: org.id,
-                                asset_type: 'ip',
-                                value: intelData.network_context.resolved_ip,
+                                asset_type: isIp ? 'ip' : 'domain',
+                                value: query,
                                 ownership_confidence: 100,
-                                metadata_json: { ip: intelData.network_context.resolved_ip }
+                                metadata_json: { forensic_query: query }
                             });
-                            if (ipAssetId) {
-                                await AsmService.linkAssets(assetId, ipAssetId, 'hosted_on');
-                            }
-                        }
 
-                        // 3. Subnet Expansion (Phase F)
-                        if (isIp && assetId) {
-                            await AsmService.performSubnetScan(org.id, query);
-                        }
-
-                        // 4. Discover Related Artifacts
-                        if (assetId) {
-                            await AsmService.discoverRelatedArtifacts(org.id, intelData, assetId);
-                        }
-
-                        // 4. Record Forensic Exposures
-                        (intelData.technical?.ports || []).forEach(async (p: any) => {
-                            const taxonomy = classifyExposure(p.port, p.banner, intelData.technical);
-                            if (taxonomy) {
-                                await AsmService.recordExposure({
-                                    asset_id: assetId,
-                                    taxonomy_id: taxonomy.id,
-                                    severity: taxonomy.severity,
-                                    confidence: 100,
-                                    status: 'detected',
-                                    description: taxonomy.description,
-                                    remediation_steps: taxonomy.remediation
+                            // 2. Track and link the resolved IP if it's a domain
+                            if (assetId && !isIp && intelData.network_context?.resolved_ip) {
+                                const ipAssetId = await AsmService.trackAsset({
+                                    org_id: org.id,
+                                    asset_type: 'ip',
+                                    value: intelData.network_context.resolved_ip,
+                                    ownership_confidence: 100,
+                                    metadata_json: { ip: intelData.network_context.resolved_ip }
                                 });
+                                if (ipAssetId) {
+                                    await AsmService.linkAssets(assetId, ipAssetId, 'hosted_on');
+                                }
                             }
-                        });
+
+                            // 3. Subnet Expansion (Phase F)
+                            if (isIp && assetId) {
+                                await AsmService.performSubnetScan(org.id, query);
+                            }
+
+                            // 4. Discover Related Artifacts
+                            if (assetId) {
+                                await AsmService.discoverRelatedArtifacts(org.id, intelData, assetId);
+                            }
+
+                            // 5. Record Forensic Exposures
+                            (intelData.technical?.ports || []).forEach(async (p: any) => {
+                                const taxonomy = classifyExposure(p.port, p.banner, intelData.technical);
+                                if (taxonomy) {
+                                    await AsmService.recordExposure({
+                                        asset_id: assetId,
+                                        taxonomy_id: taxonomy.id,
+                                        severity: taxonomy.severity,
+                                        confidence: 100,
+                                        status: 'detected',
+                                        description: taxonomy.description,
+                                        remediation_steps: taxonomy.remediation
+                                    });
+                                }
+                            });
+                        }
                     }
                 }
+            })();
+
+        } catch (err: any) {
+            console.error("DEBUG: Deep intel error object:", err);
+
+            let errorMessage = err.message || "Technical scan failed.";
+
+            // Try to extract the custom JSON error we returned from the function
+            if (err.context && typeof err.context === 'object') {
+                if (err.context.error) errorMessage = err.context.error;
             }
-        } catch (err) {
-            console.error("Deep intel failed:", err);
-            toast.error("Technical scan failed. Data may be incomplete.");
-        } finally {
+
+            toast.error("Forensic Scan Failed", {
+                duration: 10000,
+                description: `${errorMessage}. Check Console and Supabase Logs for details.`
+            });
             setIsLoading(false);
         }
+
     };
 
+    const processedQuery = useRef<string | null>(null);
+
     useEffect(() => {
-        if (query) fetchDeepIntel();
+        if (query && processedQuery.current !== query) {
+            processedQuery.current = query;
+            fetchDeepIntel();
+        }
     }, [query]);
 
     const handleRescan = () => {
