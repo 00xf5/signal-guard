@@ -1,9 +1,11 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
     X, Shield, Activity, Copy, Share2,
     ExternalLink, Terminal, ChevronRight,
-    Zap, AlertTriangle, Fingerprint, Database
+    Zap, AlertTriangle, Fingerprint, Database,
+    Globe, Info, Code
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,6 +69,31 @@ const IntelTacticalSidebar: React.FC<TacticalSidebarProps> = ({ isOpen, onClose,
                                 </button>
                             </div>
 
+                            {/* Section 0: System Navigation */}
+                            <div className="space-y-4">
+                                <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <Terminal className="w-3 h-3 text-info" /> System_Navigation
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Link to="/discovery" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-success/30 transition-all group">
+                                        <Globe className="w-4 h-4 text-success" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-success">Discovery</span>
+                                    </Link>
+                                    <Link to="/inventory" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-info/30 transition-all group">
+                                        <Database className="w-4 h-4 text-info" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-info">Inventory</span>
+                                    </Link>
+                                    <Link to="/about" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
+                                        <Info className="w-4 h-4 text-muted-foreground" />
+                                        <span className="text-xs font-bold text-foreground">About</span>
+                                    </Link>
+                                    <Link to="/docs" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
+                                        <Code className="w-4 h-4 text-muted-foreground" />
+                                        <span className="text-xs font-bold text-foreground">Docs</span>
+                                    </Link>
+                                </div>
+                            </div>
+
                             {/* Section 2: Intelligence Snapshot */}
                             <div className="space-y-4">
                                 <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
@@ -80,8 +107,8 @@ const IntelTacticalSidebar: React.FC<TacticalSidebarProps> = ({ isOpen, onClose,
                                             <div className="text-4xl font-black text-foreground italic">{data?.summary?.grade || 'N/A'}</div>
                                         </div>
                                         <div className={`w-16 h-16 rounded-2xl border-2 flex flex-col items-center justify-center font-black ${(data?.summary?.risk_score || 0) > 70 ? 'bg-red-500/10 border-red-500/30 text-red-500' :
-                                                (data?.summary?.risk_score || 0) > 40 ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' :
-                                                    'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+                                            (data?.summary?.risk_score || 0) > 40 ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' :
+                                                'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
                                             }`}>
                                             <span className="text-xl leading-none">{data?.summary?.risk_score || 0}</span>
                                             <span className="text-[8px] uppercase">Score</span>

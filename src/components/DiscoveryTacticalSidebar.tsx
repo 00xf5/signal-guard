@@ -1,9 +1,10 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
     X, History, Activity, Zap,
     ArrowRight, Globe, ShieldAlert,
-    Clock, Cpu, Terminal
+    Clock, Cpu, Terminal, Database, Info, Code
 } from "lucide-react";
 
 interface DiscoverySidebarProps {
@@ -58,6 +59,31 @@ const DiscoveryTacticalSidebar: React.FC<DiscoverySidebarProps> = ({
                                 <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
                                     <X className="w-5 h-5 text-muted-foreground" />
                                 </button>
+                            </div>
+
+                            {/* Section 0: System Navigation */}
+                            <div className="space-y-4">
+                                <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <Terminal className="w-3 h-3 text-success" /> System_Navigation
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Link to="/discovery" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-success/30 transition-all group">
+                                        <Globe className="w-4 h-4 text-success" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-success">Discovery</span>
+                                    </Link>
+                                    <Link to="/inventory" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-info/30 transition-all group">
+                                        <Database className="w-4 h-4 text-info" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-info">Inventory</span>
+                                    </Link>
+                                    <Link to="/about" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
+                                        <Info className="w-4 h-4 text-muted-foreground" />
+                                        <span className="text-xs font-bold text-foreground">About</span>
+                                    </Link>
+                                    <Link to="/docs" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
+                                        <Code className="w-4 h-4 text-muted-foreground" />
+                                        <span className="text-xs font-bold text-foreground">Docs</span>
+                                    </Link>
+                                </div>
                             </div>
 
                             {/* Section 2: Global Heat Index */}
