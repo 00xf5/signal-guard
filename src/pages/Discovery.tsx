@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Globe, ShieldAlert, Cpu, Activity, Map, Lock, Server, AlertTriangle, ExternalLink } from "lucide-react";
+import { Search, Globe, ShieldAlert, Cpu, Activity, Map, Lock, Server, AlertTriangle, ExternalLink, Clock, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import SEOContent from "@/components/SEOContent";
 
@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AsmService } from "@/lib/asm-service";
 import { classifyExposure } from "@/lib/taxonomy";
 import DiscoveryTimeline from "@/components/DiscoveryTimeline";
+import DiscoveryTacticalSidebar from "@/components/DiscoveryTacticalSidebar";
 
 const Discovery = () => {
     const [query, setQuery] = useState("");
@@ -639,7 +640,7 @@ const Discovery = () => {
                 onClick={() => setIsSidebarOpen(true)}
                 className="fixed bottom-6 left-6 lg:hidden w-14 h-14 bg-success text-black rounded-full shadow-[0_0_30px_rgba(34,197,94,0.3)] flex items-center justify-center z-[90] active:scale-95 transition-transform border-4 border-background"
             >
-                <TerminalIcon className="w-6 h-6" />
+                <Terminal className="w-6 h-6" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-info rounded-full border-2 border-background animate-pulse" />
             </button>
         </div>
