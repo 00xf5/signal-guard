@@ -8,8 +8,8 @@ const About = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "RiskSignal",
-        "url": "https://risksignal-tau.vercel.app/about",
-        "logo": "https://risksignal-tau.vercel.app/favicon.png",
+        "url": "https://app.risksignal.name.ng/about",
+        "logo": "https://app.risksignal.name.ng/favicon.png",
         "description": "High-fidelity IP intelligence and network analysis platform for security professionals."
     };
 

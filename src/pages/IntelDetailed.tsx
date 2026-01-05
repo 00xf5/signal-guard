@@ -130,7 +130,14 @@ const IntelDetailed = () => {
 
     const fetchDeepIntel = async () => {
         setIsLoading(true);
+
+        // Force loading to end after 2 seconds max
+        const loadingTimeout = setTimeout(() => {
+            setIsLoading(false);
+        }, 2000);
+
         if (!query) {
+            clearTimeout(loadingTimeout);
             toast.error("Invalid Target", { description: "The search query is missing from the URL." });
             setIsLoading(false);
             return;
@@ -142,6 +149,7 @@ const IntelDetailed = () => {
             });
 
             if (error) throw error;
+            clearTimeout(loadingTimeout);
             setData(intelData);
             setIsLoading(false); // <--- UNBLOCK UI IMMEDIATELY
 
