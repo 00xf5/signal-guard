@@ -1,6 +1,6 @@
 # RiskSignal — Real-Time Forensic IP Intelligence & Attack Surface Management (ASM)
 
-[![RiskSignal Live](https://img.shields.io/badge/Live-RiskSignal-blue?style=for-the-badge)](https://risksignal-tau.vercel.app/)
+[![RiskSignal Live](https://img.shields.io/badge/Live-RiskSignal-blue?style=for-the-badge)](https://app.risksignal.name.ng/)
 
 **RiskSignal** is a high-fidelity intelligence powerhouse built for developers, security specialists, and bug hunters. It converts raw network telemetry into actionable forensic insights, combining real-time port scanning, CVE vulnerability mapping, and **Time-Aware Attack Surface Management (ASM)** into a single, seamless platform.
 
