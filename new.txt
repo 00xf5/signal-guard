@@ -1,0 +1,839 @@
+Below is the clean modular decomposition of the whole SignalShadow system — each part isolated, replaceable, testable, and scalable. No spaghetti. No god‑service.
+
+I’ll keep it implementation‑oriented, not fluff.
+
+🧱 SignalShadow – Modular Architecture Breakdown
+
+Each module is logically independent and communicates via typed contracts (events / structs), not tight coupling.
+
+1️⃣ Auth Execution Module
+
+AuthRunner
+
+Responsibility
+
+Perform login
+
+Detect successful authentication
+
+Hand off authenticated browser context
+
+Inputs
+
+Login URL
+
+Credentials
+
+Auth type (form / token / cookie)
+
+Outputs
+
+Authenticated Playwright context
+
+Raw auth artifacts
+
+Key Functions
+runLogin()
+detectAuthSuccess()
+extractAuthArtifacts()
+
+Replaceable?
+
+✅ Yes (can swap Playwright, add SSO support later)
+
+2️⃣ Auth Session Vault
+
+AuthSessionStore
+
+Responsibility
+
+Persist auth state
+
+Rehydrate sessions
+
+Detect auth drift
+
+Stored Artifacts
+
+Cookies
+
+localStorage
+
+sessionStorage
+
+Auth headers
+
+JWT claims (metadata only)
+
+Outputs
+
+session_id
+
+auth_state_hash
+
+Key Functions
+saveSession()
+loadSession()
+hashAuthState()
+compareAuthStates()
+
+Replaceable?
+
+✅ Yes (DB, Redis, encrypted file store)
+
+3️⃣ Network Intelligence Module
+
+NetObserver
+
+Responsibility
+
+Observe ALL network activity
+
+Normalize requests/responses
+
+Feed data downstream
+
+Captures
+
+XHR / Fetch
+
+Navigation requests
+
+GraphQL ops
+
+WebSocket init
+
+Outputs
+
+Normalized network events
+
+Key Functions
+onRequest()
+onResponse()
+normalizeRequest()
+
+Replaceable?
+
+✅ Yes (pure observer, no business logic)
+
+4️⃣ JavaScript Collection Module
+
+JsHarvester
+
+Responsibility
+
+Collect all post-auth JS
+
+Normalize JS for hashing
+
+Store JS snapshots
+
+Inputs
+
+Network responses
+
+Script tags
+
+Outputs
+
+js_bundle_set
+
+js_hash
+
+Key Functions
+collectScripts()
+normalizeJs()
+hashJsBundle()
+
+Replaceable?
+
+✅ Yes (can add AST parsing later)
+
+5️⃣ Route Discovery Module
+
+RouteExtractor
+
+Responsibility
+
+Discover application routes
+
+Score confidence
+
+De-duplicate noise
+
+Sources
+
+JS static analysis
+
+Router manifests
+
+Network navigation
+
+Prefetch hints
+
+Outputs
+
+route_set (with confidence)
+
+Key Functions
+extractFromJs()
+extractFromNetwork()
+scoreRoutes()
+
+Replaceable?
+
+✅ Yes (framework-specific plugins)
+
+6️⃣ Route Probing Module
+
+RouteVerifier
+
+Responsibility
+
+Confirm route existence
+
+Classify auth enforcement
+
+Trigger lazy loads
+
+Inputs
+
+route_set
+
+Outputs
+
+verified_routes
+
+Key Functions
+probeRoute()
+classifyResponse()
+
+Replaceable?
+
+✅ Yes (can add crawl depth later)
+
+7️⃣ Lazy Load Trigger Module
+
+BehaviorTrigger
+
+Responsibility
+
+Trigger non-destructive behaviors
+
+Coerce hidden network activity
+
+Behaviors
+
+Route navigation
+
+Smart scrolling
+
+Safe UI events
+
+Outputs
+
+additional network intel
+
+Key Functions
+triggerScroll()
+triggerSafeEvents()
+
+Replaceable?
+
+✅ Yes (policy-driven)
+
+8️⃣ Endpoint Intelligence Module
+
+ApiProfiler
+
+Responsibility
+
+Build endpoint inventory
+
+Classify endpoints
+
+Detect auth misuse
+
+Inputs
+
+Network events
+
+Outputs
+
+endpoint_graph
+
+endpoint_hash
+
+Key Functions
+profileEndpoint()
+classifyEndpoint()
+
+Replaceable?
+
+✅ Yes (GraphQL specialization)
+
+9️⃣ Auth & Privilege Analyzer
+
+PrivilegeMapper
+
+Responsibility
+
+Map auth state → routes → APIs
+
+Detect privilege anomalies
+
+Outputs
+
+privilege_map
+
+privilege_hash
+
+Key Functions
+buildPrivilegeMap()
+detectPrivilegeMismatch()
+
+Replaceable?
+
+✅ Yes (role-aware extensions)
+
+🔟 Drift Detection Engine
+
+DriftEngine
+
+Responsibility
+
+Compare snapshots over time
+
+Classify drift type
+
+Emit forensic events
+
+Inputs
+
+Previous snapshot
+
+Current snapshot
+
+Outputs
+
+drift_events
+
+Key Functions
+diffHashes()
+classifyDrift()
+
+Replaceable?
+
+❌ Core logic — but extensible
+
+1️⃣1️⃣ Risk Scoring & Taxonomy
+
+RiskInjector
+
+Responsibility
+
+Translate findings into RiskSignal taxonomy
+
+Assign severity
+
+Inject into forensic timeline
+
+Outputs
+
+exposures
+
+timeline entries
+
+Key Functions
+scoreRisk()
+mapToTaxonomy()
+
+Replaceable?
+
+❌ Core business value
+
+1️⃣2️⃣ Orchestration Layer
+
+ShadowOrchestrator
+
+Responsibility
+
+Control execution order
+
+Handle retries
+
+Enforce safety policies
+
+Flow Control
+Auth → Session → Observe → Harvest → Extract → Probe → Analyze → Diff → Inject
+
+Replaceable?
+
+❌ This is the spine
+
+🧩 Inter-Module Communication Style
+Strong Rule:
+
+❌ No module reaches into another’s internals
+
+Communication via:
+
+Typed events
+
+Immutable snapshots
+
+Hash references
+
+Example:
+
+JsHarvester → emits js_bundle_hash
+DriftEngine consumes hash only
+
+
+This keeps your system sane.
+
+🧠 Why This Modularity Matters
+
+You can ship partial MVP
+
+You can disable aggressive parts
+
+You can sell tiers
+
+You can test modules in isolation
+
+You can replace internals without breaking product
+
+
+
+
+Now here is the FULL “FEATURES + HOW‑IT‑WORKS” DOCUMENT you asked for — written like a real internal spec, not vibes.
+
+🛡️ RiskSignal – Post‑Auth Recon & Drift System
+Hard Recon Automation Engine (No AI, No Noise)
+
+Goal: eliminate manual recon work for bug hunters by automatically extracting authenticated attack surface intelligence and tracking behavioral drift over time — without storing sensitive payloads or full files.
+
+1️⃣ Core Design Principles
+
+Observe, don’t fuzz
+
+Hash everything, store intelligence only
+
+Browser truth > static guessing
+
+Post‑auth > pre‑auth
+
+Hunter decides exploitability, system delivers recon
+
+2️⃣ What Is Stored vs NOT Stored
+❌ NOT STORED
+
+Full JS files
+
+Full HTML pages
+
+Response bodies
+
+Credentials
+
+Tokens (raw)
+
+✅ STORED
+
+Cryptographic hashes
+
+Route lists
+
+Endpoint schemas
+
+Auth behavior metadata
+
+Structural diffs
+
+Recon intelligence artifacts
+
+This keeps:
+
+DB small
+
+Legal risk low
+
+Performance high
+
+3️⃣ High-Level Execution Flow
+User submits domain + auth
+↓
+Headless browser logs in
+↓
+Network observer records behavior
+↓
+JS & routes extracted in-memory
+↓
+Artifacts normalized
+↓
+Hashes generated
+↓
+Diff against last snapshot
+↓
+Recon intelligence saved
+↓
+Hunter consumes outputs
+
+4️⃣ Authentication Intelligence Engine
+Feature: Auth Flow Execution
+
+What it does
+
+Logs in using real browser
+
+Supports:
+
+Form auth
+
+Cookie injection
+
+Bearer token
+
+Why it matters
+
+SPA logic only appears post-auth
+
+APIs behave differently after login
+
+Feature: Auth Success Detection
+
+Detected via:
+
+Cookie creation
+
+Authorization headers
+
+Redirect away from login
+
+Auth-only API calls
+
+No DOM guessing. Pure behavior.
+
+Feature: Auth State Fingerprinting
+
+Captured metadata:
+
+Cookie names (not values)
+Storage keys
+Auth header patterns
+JWT claim structure (not token)
+
+
+Stored as:
+
+auth_state_hash
+
+
+Drift here = high severity
+
+5️⃣ JavaScript Intelligence Engine
+Feature: Post‑Auth JS Harvesting
+
+Collected from:
+
+Script tags
+
+Dynamic imports
+
+Network responses
+
+Only JS loaded after authentication is processed.
+
+Feature: JS Normalization
+
+Before hashing:
+
+Strip comments
+
+Remove timestamps
+
+Normalize whitespace
+
+Keep string literals
+
+Stable ordering
+
+Result:
+
+js_bundle_hash
+
+Feature: JS‑Derived Intelligence Extraction
+
+Extracted artifacts:
+
+API paths
+
+Route strings
+
+Feature flags
+
+Role checks
+
+Disabled features
+
+Conditional logic hints
+
+Saved as:
+
+js_intel {
+  routes[]
+  api_refs[]
+  feature_flags[]
+}
+
+6️⃣ Route Discovery Engine
+Feature: Passive Route Extraction
+
+Routes discovered from:
+
+JS bundle strings
+
+Router manifests
+
+Network navigation
+
+Prefetch hints
+
+Each route gets:
+
+path
+source
+confidence_score
+
+Feature: Route Verification
+
+Routes are probed safely:
+
+GET only
+
+No mutations
+
+Responses classified:
+
+Response	Meaning
+200	Accessible
+401	Exists, auth-guarded
+403	Exists, role-guarded
+302	Exists, redirected
+404	Discarded
+
+Saved as:
+
+route_set_hash
+
+7️⃣ Lazy‑Loading Coercion System
+Feature: Behavior‑Driven Loading
+
+Triggers:
+
+Direct route navigation
+
+Smart scrolling
+
+Safe UI events
+
+🚫 Never:
+
+Submit forms
+
+Delete data
+
+Confirm actions
+
+Trigger payments
+
+This reveals:
+
+Infinite loaders
+
+Background APIs
+
+Feature‑gated data
+
+8️⃣ Network & API Intelligence Engine
+Feature: Full Network Observation
+
+Captured:
+
+Method
+
+Path
+
+Query structure
+
+Headers (sanitized)
+
+Response schema hash
+
+Stored as:
+
+endpoint_intel {
+  method
+  path
+  auth_type
+  schema_hash
+}
+
+Feature: Endpoint Classification
+
+Rules-based:
+
+/admin → privileged
+
+/internal → sensitive
+
+/user → user scope
+
+This builds:
+
+endpoint_graph_hash
+
+9️⃣ Privilege & Access Mapping
+Feature: Privilege Map Generation
+
+Maps:
+
+Auth State → Routes → APIs → Data Access
+
+
+Produces:
+
+Endpoint	Role	Access
+/api/admin/users	user	❌
+/api/export	user	⚠️
+
+Saved as:
+
+privilege_map_hash
+
+🔟 IDOR & BAC Recon Heuristics (No Exploits)
+Detected Patterns:
+
+Admin-looking APIs hit by low roles
+
+Same endpoint across roles
+
+Predictable ID structures
+
+Missing server-side checks
+
+Role mismatch between UI & API
+
+Each adds risk weight, not exploit claim.
+
+1️⃣1️⃣ Drift Detection Engine (THE CORE VALUE)
+Snapshot Hashes Tracked
+auth_state_hash
+js_bundle_hash
+route_set_hash
+endpoint_graph_hash
+privilege_map_hash
+
+Drift Types
+Drift	Meaning
+JS changed	New client logic
+Routes added	Feature exposure
+Endpoint schema changed	Backend change
+Auth behavior changed	Security regression
+Privilege map changed	BAC risk
+
+Each drift becomes a forensic timeline event.
+
+1️⃣2️⃣ Recon Artifacts Delivered to Hunter
+Feature: Recon Output Sets
+
+You get lists, not alerts:
+
+Authenticated endpoints
+
+Hidden routes
+
+JS‑derived API intent
+
+Privilege mismatches
+
+ID patterns
+
+Drift deltas
+
+Export formats:
+
+JSON
+
+CSV
+
+HAR‑like summaries
+
+1️⃣3️⃣ What This Enables for You (Personally)
+Before
+
+Burp + clicking
+
+Miss endpoints
+
+Fatigue
+
+Guesswork
+
+After
+
+One login
+
+Complete recon map
+
+Time‑based diffs
+
+Focus on exploitation
+
+This is hard recon automation, not scanning.
+
+1️⃣4️⃣ What This System Is NOT
+
+❌ Not vulnerability scanner
+
+❌ Not exploit engine
+
+❌ Not AI guesser
+
+❌ Not brute forcer
+
+It is forensic recon intelligence.
+
+1️⃣5️⃣ Why This Is the Right Design
+
+Minimal storage
+
+High signal
+
+Legally safer
+
+Scales cleanly
+
+Bug‑hunter‑centric
+
+You built a system that does:
+
+“Everything I hate doing manually.”
+
+That’s the correct problem.
+
+🏁 Final Reality Check
+
+Yes:
+
+Only hashes go into DB
+
+Intelligence artifacts are structured
+
+Full files are disposable
+
+Drift becomes your edge
+
+This is not overkill.
+This is what serious hunters wish existed.

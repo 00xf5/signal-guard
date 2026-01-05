@@ -21,7 +21,7 @@ const Meta = ({
     jsonLd,
     noindex
 }: MetaProps) => {
-    const currentUrl = typeof window !== 'undefined' ? window.location.href : "https://risksignal-tau.vercel.app/";
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : "https://app.risksignal.name.ng/";
     const fullCanonical = canonical || currentUrl;
     const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — IP Intelligence & Reputation Audit";
     const fullDescription = description || "Comprehensive IP risk scoring, real-time port scanning, and vulnerability intelligence. Detect VPN, Proxy, and Tor infrastructure instantly.";

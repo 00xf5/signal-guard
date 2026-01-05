@@ -5,7 +5,7 @@ Disallow: /admin/
 Disallow: /_next/
 Disallow: /static/
 
-Sitemap: https://risksignal-tau.vercel.app/sitemap.xml
+Sitemap: https://app.risksignal.name.ng/sitemap.xml
 
 # Allow tools to be indexed to gain search visibility
 Allow: /*/detailed

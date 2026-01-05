@@ -1,0 +1,128 @@
+🌌 SIGNALSHADOW: THE MANIFESTO
+================================
+
+1. LOGIC OVER NOISE
+Most tools guess. SignalShadow observes. We don't care about "scanning" for vulnerabilities; we care about mapping the "truth" of an application's behavior. If the logic changes, the attack surface changes.
+
+2. THE FORENSIC MIRROR
+We build a cryptographic mirror of the target. We store hashes, not code. We store schemas, not data. This protects the hunter and the target while providing absolute clarity on what changed, when, and where.
+
+3. AUTHENTICATED REALITY
+The modern web only reveals itself to those with a key. SignalShadow is designed to be the ultimate authenticated observer. It "lives" inside the session, seeing exactly what a user (or an attacker) sees.
+
+4. DISPOSABLE DATA, PERMANENT INTELLIGENCE
+Raw response bodies are ephemeral. They should be shown live and then discarded. Only the structured intelligence (hashes, routes, schemas) is permanent. This is our Legal & Privacy firewall.
+
+
+🛠️ TECH STACK: THE MODERN SHADOW
+================================
+
+CORE RUNTIME: Deno 2.x
+- Purpose: Secure-by-default execution, native TypeScript, and zero-config module management.
+- Why: Deno's permission system (--allow-net, --allow-read) is perfect for a security tool that shouldn't have unfettered system access.
+
+BROWSER ENGINE: Playwright (via Deno)
+- Purpose: Authenticated execution and network interception.
+- Customizations: Stealth-patched to evade bot detection (DataDome/Akamai).
+
+LOCAL FORENSICS: SQLite (via Deno K/V or SQLite Wasm)
+- Purpose: Lightning-fast local snapshotting and hash comparisons.
+- Role: Stores the "Memory" of the target.
+
+EXTERNAL SYNC: Supabase (Postgres/Auth)
+- Purpose: Long-term storage of risk timelines and multi-user access.
+- Role: The "Central Brain" for the SignalGuard frontend to query.
+
+COMMUNICATION: Typed Proto-Events
+- Purpose: Modules talk via strictly typed events.
+- Method: Deno's native BroadcastChannel or a simple internal event bus.
+
+
+🔄 MODULE FUNCTIONALITY & DATA FLOW
+===================================
+
+[1] AuthRunner (Deno + Playwright)
+----------------------------------
+- OPERATION: Executes the "Auth Input Context" rules. Handles the Headed-Handover when MFA/Captcha is detected.
+- INPUT: { target_url, credentials, mfa_strategy, success_signature }
+- OUTPUT: { playwright_context_id, auth_state_hash }
+- DATA TRANSMISSION: Emits `AUTH_ESTABLISHED` event with a reference to the active browser context.
+
+[2] NetObserver (Intercept Layer)
+----------------------------------
+- OPERATION: Attaches to the Playwright context. Records every XHR/Fetch/WebSocket.
+- LOGIC: Filters out noise (CDNs, Analytics) in-memory. Redacts PII from response bodies.
+- OUTPUT: { normalized_request_stream }
+- DATA TRANSMISSION: Streams `NETWORK_EVENT` items to JsHarvester and ApiProfiler.
+
+[3] JsHarvester (The Normalizer)
+----------------------------------
+- OPERATION: Picks up JS files from the network stream. Strips comments/timestamps. Extracts string literals.
+- LOGIC: Performs AST-based normalization to ensure stable hashes.
+- OUTPUT: { js_bundle_hash, extracted_routes[], extracted_api_refs[] }
+- DATA TRANSMISSION: Stores hash in local SQLite; sends `EXTRACTED_RECON` to RouteExtractor.
+
+[4] RouteExtractor (The Cartographer)
+-------------------------------------
+- OPERATION: Merges navigation history with JS-mined routes. 
+- LOGIC: Confidence scoring (verified via Network vs. guessed from JS).
+- OUTPUT: { route_map_hash, pending_verification_set[] }
+
+[5] BehaviorTrigger (The Coercer)
+----------------------------------
+- OPERATION: Clicks safe UI elements. Triggers scrolls. Navigates to discovered but unvisited routes.
+- LOGIC: Avoids "Logic Blacklist" (Logout/Delete).
+- OUTPUT: { additional_network_intel }
+
+[6] DriftEngine (The Chronologist)
+----------------------------------
+- OPERATION: The final stop. Compares the current snapshot (the "Now") with the last state in SQLite (the "Then").
+- LOGIC: Classifies changes (Schema Drift, Route Drift, Auth Drift).
+- OUTPUT: { forensic_events[] }
+
+
+🧩 HUMAN-IN-THE-LOOP (H.I.T.L) MECHANICS
+========================================
+
+Trigger: `AUTH_OBSTACLE_DETECTED`
+1. HEADLESS -> HEADED: The Deno process spawns a visible chromium window.
+2. INPUT HANDOVER: The Hunter is prompted via terminal/GUI to solve the challenge.
+3. STATE CAPTURE: Once the `success_signature` is detected in the headed window, the browser closes, cookies are extracted, and the Headless `AuthRunner` resumes.
+4. RE-USE: The session is saved to `AuthSessionVault` so the human doesn't have to intervene again until the session expires.
+
+
+🔗 INTEGRATION INTO EXISTING CODEBASE (SIGNAL-GUARD)
+===================================================
+
+SignalShadow is the "Backend Engine," while SignalGuard (the React/Vite app) is the "Command & Control" (C2).
+
+1. DIRECTORY STRUCTURE:
+   - `/src`: Existing React frontend.
+   - `/shadow`: NEW Deno-based SignalShadow engine.
+   - `/supabase`: Shared schemas for both.
+
+2. DATABASE SYNC:
+   - SignalShadow (Deno) writes `forensic_events` and `drift_summaries` to Supabase.
+   - SignalGuard (React) subscribes to these tables via Realtime for "Live Intelligence" updates.
+
+3. CMD INTERFACE:
+   - SignalGuard launches "Shadow Runs" via a Supabase Edge Function or a local WebSocket bridge to the Deno runner.
+
+4. AUTH SHARING:
+   - SignalShadow retrieves the Hunter's credentials/secrets from Supabase Secrets to perform the automated logins.
+
+
+🚀 ANTIGRAVITY'S "THINK BEYOND" ADDITIONS
+=========================================
+
+1. SELF-HEALING SELECTORS
+If a login field's ID changes (e.g., from `email` to `id-123`), SignalShadow should use fuzzy matching (coordinate-based or label-based) to find the field anyway, then emit a "UI Drift" event to update its internal selector map.
+
+2. GLOBAL THREAT INTELLIGENCE (GTI) MAPPING
+When an API endpoint is discovered, cross-reference its schema against known CVE patterns or "Hot-Paths" (like `/graph-ql` with introspection enabled). This turns raw recon into "Suggested Exploit Paths."
+
+3. THE "GHOST" SNAPSHOT
+Running a scan once as `USER_A` and once as `USER_B`, then diffing the *Privilege Maps*. If `USER_B` sees routes that `USER_A` can hit but shouldn't, we've automated the discovery of broken access controls.
+
+================================
+END OF SPECIFICATION
