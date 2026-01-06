@@ -211,9 +211,7 @@ const ApiAccess = () => {
                         </div>
                     )}
 
-                    {/* LIVE QUOTA & TRUST MARKETING */}
                     <div className="grid md:grid-cols-2 gap-8 pt-8">
-                        {/* QUOTA MONITOR */}
                         <div className="bg-panel-bg/20 border border-panel-border rounded-[2rem] p-8 space-y-6 group">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-info/10 rounded-xl group-hover:scale-110 transition-transform">
@@ -271,7 +269,6 @@ const ApiAccess = () => {
                             )}
                         </div>
 
-                        {/* TRUST MARKET STRATEGY */}
                         <div className="bg-black/40 border border-panel-border rounded-[2rem] p-8 space-y-6">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-success/10 rounded-xl">
@@ -326,7 +323,6 @@ const ApiAccess = () => {
                         </div>
                     </div>
 
-                    {/* API PREVIEW / DOCS */}
                     <div className="space-y-6 pt-12">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-panel-border">
@@ -422,7 +418,6 @@ resp, _ := client.Do(req)`}
                         </div>
                     </div>
 
-                    {/* FOOTER VALUES */}
                     <div className="grid sm:grid-cols-3 gap-6 pt-12 border-t border-panel-border">
                         <div className="space-y-2">
                             <h4 className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Ultra_Latency</h4>

@@ -21,7 +21,6 @@ import { AsmService } from "@/lib/asm-service";
 import { classifyExposure } from "@/lib/taxonomy";
 
 const MapVisual = ({ lat, lng }: { lat: number, lng: number }) => {
-    // Check if we have valid coordinates (0,0 is usually a failure in IP geo APIs)
     const hasData = lat !== undefined && lng !== undefined && (lat !== 0 || lng !== 0);
 
     if (!hasData) return (
@@ -35,10 +34,6 @@ const MapVisual = ({ lat, lng }: { lat: number, lng: number }) => {
 
     return (
         <div className="relative w-full h-40 bg-terminal-bg rounded-lg overflow-hidden border border-panel-border group">
-            {/* Dark Map Filter Layer */}
-            <div className="absolute inset-0 z-10 pointer-events-none border border-info/10 rounded-lg" />
-
-            {/* The Real Map */}
             <iframe
                 title="Location Map"
                 className="w-full h-full grayscale-[1] contrast-[1.2] brightness-[0.7] invert-[0.9] hue-rotate-[180deg] opacity-60 group-hover:opacity-100 transition-opacity"
@@ -49,13 +44,11 @@ const MapVisual = ({ lat, lng }: { lat: number, lng: number }) => {
                 src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005}%2C${lat - 0.005}%2C${lng + 0.005}%2C${lat + 0.005}&layer=mapnik&marker=${lat}%2C${lng}`}
             />
 
-            {/* Visual Overlays (Subtle Radar Effect) */}
             <div className="absolute inset-0 z-20 pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <div className="w-12 h-12 border border-info/20 rounded-full animate-ping absolute" />
                     <div className="w-2 h-2 bg-info rounded-full shadow-[0_0_10px_#1e90ff] relative z-10" />
                 </div>
-                {/* HUD Corners */}
                 <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-info/40" />
                 <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-info/40" />
                 <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-info/40" />
@@ -141,7 +134,6 @@ const IntelDetailed = () => {
     const fetchDeepIntel = async () => {
         setIsLoading(true);
 
-        // Force loading to end after 2 seconds max
         const loadingTimeout = setTimeout(() => {
             setIsLoading(false);
         }, 2000);
@@ -161,7 +153,7 @@ const IntelDetailed = () => {
             if (error) throw error;
             clearTimeout(loadingTimeout);
             setData(intelData);
-            setIsLoading(false); // <--- UNBLOCK UI IMMEDIATELY
+            setIsLoading(false);
 
             const targetIp = intelData?.network_context?.resolved_ip;
             if (targetIp && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(targetIp)) {
@@ -175,8 +167,6 @@ const IntelDetailed = () => {
                 setSubnetIps(range);
             }
 
-            // === ASM CORE INTEGRATION (Background Task) ===
-            // We do not await this block to let the UI render
             (async () => {
                 if (intelData && query) {
                     const isIp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query);
@@ -209,7 +199,6 @@ const IntelDetailed = () => {
                                 }
                             }
 
-                            // 3. Subnet Expansion (Phase F)
                             if (isIp && assetId) {
                                 await AsmService.performSubnetScan(org.id, query);
                             }
@@ -238,13 +227,9 @@ const IntelDetailed = () => {
                     }
                 }
             })();
-
         } catch (err: any) {
-            console.error("DEBUG: Deep intel error object:", err);
-
             let errorMessage = err.message || "Technical scan failed.";
 
-            // Try to extract the custom JSON error we returned from the function
             if (err.context && typeof err.context === 'object') {
                 if (err.context.error) errorMessage = err.context.error;
             }
@@ -347,7 +332,6 @@ const IntelDetailed = () => {
             <Header />
 
             <main className="pt-14 relative">
-                {/* Toolbar */}
                 <div className="h-16 border-b border-panel-border bg-panel-bg/95 backdrop-blur-xl sticky top-[56px] z-40 px-8 flex items-center justify-between text-foreground">
                     <div className="flex items-center gap-6">
                         <button onClick={() => navigate('/discovery')} className="p-2 hover:bg-foreground/5 rounded-full transition-colors group text-foreground/60">
@@ -379,10 +363,8 @@ const IntelDetailed = () => {
                 </div>
 
                 <div className="shodan-layout">
-                    {/* LEFT SIDEBAR: PROFILE */}
                     <aside className="border-r border-panel-border bg-panel-bg p-8 overflow-y-auto custom-scrollbar">
                         <section className="space-y-10">
-                            {/* IDENTITY CARD */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-info/5 border border-info/20 rounded-2xl flex items-center justify-center text-info">
@@ -523,9 +505,7 @@ const IntelDetailed = () => {
                         </section>
                     </aside>
 
-                    {/* Main Content */}
                     <div className="bg-app-bg overflow-y-auto custom-scrollbar relative">
-                        {/* Forensic Verdict Banner */}
                         {data?.summary?.forensic_verdict === "DIRECT_ORIGIN_EXPOSURE" && (
                             <motion.div
                                 initial={{ height: 0, opacity: 0 }}
@@ -547,7 +527,6 @@ const IntelDetailed = () => {
 
                         <div className="p-10 border-b border-panel-border bg-panel-bg/50 grid-bg">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                                {/* RISK SCORE ENGINE - ATTRIBUTION TREE */}
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -577,7 +556,6 @@ const IntelDetailed = () => {
                                         <span className="text-muted-foreground/40 font-mono text-xl">%</span>
                                     </div>
 
-                                    {/* RISK ATTRIBUTION LEDGER */}
                                     <div className="space-y-2 mt-4">
                                         <div className="flex items-center gap-2 mb-3">
                                             <div className="h-[1px] flex-grow bg-foreground/5" />
@@ -605,7 +583,6 @@ const IntelDetailed = () => {
                                     </div>
                                 </motion.div>
 
-                                {/* SECURITY GRADE HUB */}
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -636,7 +613,6 @@ const IntelDetailed = () => {
                                     </div>
                                 </motion.div>
 
-                                {/* ASSET INTELLIGENCE FEED */}
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -674,7 +650,6 @@ const IntelDetailed = () => {
                             </div>
                         </div>
 
-                        {/* INTERACTIVE NAVIGATION */}
                         <div className="px-6 md:px-10 flex items-center gap-4 md:gap-10 border-b border-panel-border bg-app-bg sticky top-[120px] z-30 overflow-x-auto no-scrollbar whitespace-nowrap">
                             {[
                                 { id: 'services', label: 'Ports & Protocols', icon: Layers },
@@ -696,7 +671,6 @@ const IntelDetailed = () => {
                             ))}
                         </div>
 
-                        {/* PANEL CONTENT EXPLORER */}
                         <div className="p-10">
                             <AnimatePresence mode="wait">
                                 {activeTab === 'services' && (
@@ -741,7 +715,6 @@ const IntelDetailed = () => {
                                                     </div>
 
                                                     <div className={`grid grid-cols-1 ${hasMetadata ? 'xl:grid-cols-[1fr_400px]' : ''} gap-8`}>
-                                                        {/* MAIN BANNER CONSOLE */}
                                                         <div className="bg-panel-bg border border-panel-border rounded-2xl overflow-hidden font-mono group hover:border-muted-foreground transition-colors">
                                                             <div className="bg-terminal-bg/50 px-6 py-3 border-b border-panel-border flex items-center justify-between">
                                                                 <div className="flex items-center gap-3">

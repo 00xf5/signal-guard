@@ -32,11 +32,9 @@ const AdminDashboard = () => {
     const [auditLogs, setAuditLogs] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState('api_keys');
 
-    // Bulk Import State
     const [bulkInput, setBulkInput] = useState("");
     const [isImporting, setIsImporting] = useState(false);
 
-    // Simple Auth Check
     useEffect(() => {
         const session = sessionStorage.getItem('admin_session');
         if (!session) {
@@ -66,7 +64,6 @@ const AdminDashboard = () => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            // Fetch stats
             const { count: orgCount } = await supabase.from('organizations').select('*', { count: 'exact', head: true });
             const { count: assetCount } = await supabase.from('assets').select('*', { count: 'exact', head: true });
             const { count: findingsCount } = await supabase.from('risk_findings').select('*', { count: 'exact', head: true });
@@ -79,7 +76,6 @@ const AdminDashboard = () => {
                 api_keys: keyCount || 0
             });
 
-            // Parallel Data Fetching
             const [
                 { data: keys },
                 { data: orgs },
@@ -111,33 +107,47 @@ const AdminDashboard = () => {
     const handleLogout = () => {
         logAuditAction('LOGOUT', { status: 'manual' });
         sessionStorage.removeItem('admin_session');
+        sessionStorage.removeItem('admin_email');
+        sessionStorage.removeItem('admin_key');
         toast.info("Command Center session terminated.");
         navigate("/admin/login");
     };
 
     const handleTopUp = async (id: string, email: string) => {
-        try {
-            const { error } = await supabase
-                .from('api_access')
-                .update({ usage_count: 0, max_usage: 1000 })
-                .eq('id', id);
+        const adminEmail = sessionStorage.getItem('admin_email');
+        const adminKey = sessionStorage.getItem('admin_key');
 
-            if (error) throw error;
-            logAuditAction('API_RECHARGE', { key_id: id, email });
+        try {
+            const { data: success, error } = await supabase.rpc('secure_admin_top_up', {
+                p_email: adminEmail,
+                p_password: adminKey,
+                p_key_id: id
+            });
+
+            if (error || !success) throw new Error(error?.message || "Verification failed");
+
             toast.success("API Key limits reset and telemetry recharged.");
             fetchData();
         } catch (error) {
-            toast.error("Failed to recharge key.");
+            toast.error("Security authorization failed.");
         }
     };
 
     const handleDeleteOrg = async (id: string, name: string) => {
         if (!confirm(`Confirm destruction of organization profile: ${name}?`)) return;
 
+        const adminEmail = sessionStorage.getItem('admin_email');
+        const adminKey = sessionStorage.getItem('admin_key');
+
         try {
-            const { error } = await supabase.from('organizations').delete().eq('id', id);
-            if (error) throw error;
-            logAuditAction('ORG_PURGE', { org_id: id, name });
+            const { data: success, error } = await supabase.rpc('secure_admin_purge_org', {
+                p_email: adminEmail,
+                p_password: adminKey,
+                p_org_id: id
+            });
+
+            if (error || !success) throw new Error(error?.message || "Verification failed");
+
             toast.success(`${name} purged from tactical registry.`);
             fetchData();
         } catch (error) {
@@ -146,14 +156,19 @@ const AdminDashboard = () => {
     };
 
     const toggleRiskRule = async (ruleId: string, currentStatus: boolean, ruleSlug: string) => {
-        try {
-            const { error } = await supabase
-                .from('risk_rules')
-                .update({ enabled: !currentStatus })
-                .eq('id', ruleId);
+        const adminEmail = sessionStorage.getItem('admin_email');
+        const adminKey = sessionStorage.getItem('admin_key');
 
-            if (error) throw error;
-            logAuditAction('RULE_TOGGLE', { rule: ruleSlug, enabled: !currentStatus });
+        try {
+            const { data: success, error } = await supabase.rpc('secure_admin_toggle_rule', {
+                p_email: adminEmail,
+                p_password: adminKey,
+                p_rule_id: ruleId,
+                p_status: !currentStatus
+            });
+
+            if (error || !success) throw new Error(error?.message || "Verification failed");
+
             toast.success(`Rule [${ruleSlug}] ${!currentStatus ? 'enabled' : 'disabled'}.`);
             fetchData();
         } catch (error) {
@@ -205,7 +220,6 @@ const AdminDashboard = () => {
             <Header />
 
             <main className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-12">
-                {/* Tactical Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h1 className="text-4xl font-black italic tracking-tighter text-white flex items-center gap-4">
@@ -233,7 +247,6 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {/* Metrics HUD */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <div className="bg-panel-bg p-6 border border-white/5 rounded-3xl group hover:border-info/30 transition-all">
                         <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-2">Tracked_Entities</div>
@@ -265,10 +278,8 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {/* Primary Interaction Interface */}
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-10">
                     <div className="space-y-8">
-                        {/* Tab Switcher */}
                         <div className="flex flex-wrap items-center gap-2 p-1.5 bg-panel-bg border border-white/5 rounded-2xl w-fit">
                             {[
                                 { id: 'api_keys', label: 'API_MANAGER', icon: Key },
@@ -291,7 +302,6 @@ const AdminDashboard = () => {
                             ))}
                         </div>
 
-                        {/* Content Area */}
                         <div className="min-h-[500px]">
                             {activeTab === 'api_keys' && (
                                 <div className="space-y-4">
@@ -474,7 +484,6 @@ const AdminDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Live Telemetry Sidebar */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 px-2">
                             <Activity className="w-4 h-4 text-info animate-pulse" />

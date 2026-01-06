@@ -143,14 +143,11 @@ const Discovery = () => {
             if (error) throw error;
             setResult(data);
 
-            // === ASM CORE INTEGRATION ===
-            // 1. Determine root domain for Org tracking
             const rootDomain = type === 'domain' ? query.trim().split('.').slice(-2).join('.') : null;
 
             if (rootDomain) {
                 const org = await AsmService.getOrCreateOrganization(rootDomain);
                 if (org) {
-                    // 2. Track the target asset
                     const assetId = await AsmService.trackAsset({
                         org_id: org.id,
                         asset_type: type,
@@ -160,7 +157,6 @@ const Discovery = () => {
                     });
 
                     if (assetId && data.network_context?.resolved_ip) {
-                        // 3. Track the IP asset
                         const ipAssetId = await AsmService.trackAsset({
                             org_id: org.id,
                             asset_type: 'ip',
@@ -170,19 +166,16 @@ const Discovery = () => {
                         });
 
                         if (ipAssetId) {
-                            // 4. Link Domain -> IP
                             await AsmService.linkAssets(assetId, ipAssetId, 'hosted_on');
                         }
                     }
 
-                    // 4. Discover Related Artifacts
                     if (assetId) {
                         await AsmService.discoverRelatedArtifacts(org.id, data, assetId);
                     }
 
                     // 5. Use Taxonomy to classify exposures (General & Taxonomy-based)
                     if (assetId) {
-                        // Check for specific exposures based on services
                         (data.technical?.ports || []).forEach(async (p: any) => {
                             const taxonomy = classifyExposure(p.port, p.banner, data.technical);
                             if (taxonomy) {
@@ -198,7 +191,6 @@ const Discovery = () => {
                             }
                         });
 
-                        // Fallback general risk if score is high
                         if (data.summary?.risk_score > 60) {
                             await AsmService.recordExposure({
                                 asset_id: assetId,
@@ -211,9 +203,7 @@ const Discovery = () => {
                     }
                 }
             }
-            // === END ASM INTEGRATION ===
 
-            // Update History
             const cleanQuery = query.trim();
             const updatedHistory = [cleanQuery, ...searchHistory.filter(h => h !== cleanQuery)].slice(0, 10);
             setSearchHistory(updatedHistory);
@@ -299,7 +289,6 @@ const Discovery = () => {
                                     <span className="flex items-center gap-1.5"><Activity className="w-3 h-3" /> Behavioral Analysis</span>
                                 </div>
 
-                                {/* AGGRESSIVE DISCOVERY TOGGLE */}
                                 <div className="flex flex-col items-center gap-3 p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl max-w-sm w-full transition-all hover:bg-orange-500/10">
                                     <div className="flex items-center justify-between w-full">
                                         <div className="flex items-center gap-2">
@@ -333,7 +322,6 @@ const Discovery = () => {
                     </div>
                 </section>
 
-                {/* HUMAN VERIFICATION MODAL/SECTION */}
                 <AnimatePresence>
                     {needsHumanVerification && (
                         <motion.section
@@ -361,11 +349,9 @@ const Discovery = () => {
                     )}
                 </AnimatePresence>
 
-                {/* RESULT SECTION */}
                 {result && !needsHumanVerification && (
                     <section className="container max-w-5xl px-4 mb-20 relative z-10">
                         <div className="border border-panel-border rounded-2xl overflow-hidden shadow-2xl bg-app-bg relative z-[1]">
-                            {/* Summary Header */}
                             <div className="p-6 md:p-8 grid md:grid-cols-2 gap-8 items-center border-b border-panel-border bg-panel-bg relative z-[2]">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">

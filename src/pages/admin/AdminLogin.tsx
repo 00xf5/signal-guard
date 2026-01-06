@@ -17,7 +17,6 @@ const AdminLogin = () => {
         setIsLoading(true);
 
         try {
-            // Using the RPC function we created in SQL
             const { data: isValid, error } = await supabase.rpc('verify_admin', {
                 p_email: email,
                 p_password: password
@@ -26,10 +25,9 @@ const AdminLogin = () => {
             if (error) throw error;
 
             if (isValid) {
-                // For a small implementation, we'll store a simple session token
-                // In a production app, we would use Supabase Auth properly
                 sessionStorage.setItem('admin_session', 'active_tactical_node');
                 sessionStorage.setItem('admin_email', email);
+                sessionStorage.setItem('admin_key', password);
                 toast.success("Identity verified. Accessing Command Center...");
                 navigate("/admin/dashboard");
             } else {
@@ -47,7 +45,6 @@ const AdminLogin = () => {
         <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <Meta title="Admin_Login | RiskSignal" noindex={true} />
 
-            {/* Background elements */}
             <div className={`absolute inset-0 opacity-20 pointer-events-none grid-bg`}></div>
             <style>{`.grid-bg { background-image: radial-gradient(rgba(30,144,255,0.1) 1px, transparent 1px); background-size: 32px 32px; }`}</style>
 
@@ -129,7 +126,6 @@ const AdminLogin = () => {
                 </div>
             </motion.div>
 
-            {/* System Status */}
             <div className="mt-8 text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

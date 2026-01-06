@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
     X, History, Activity, Zap,
-    ArrowRight, Globe, ShieldAlert,
+    ArrowRight, Globe, ShieldAlert, Shield,
     Clock, Cpu, Terminal, Database, Info, Code
 } from "lucide-react";
 

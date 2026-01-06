@@ -102,8 +102,8 @@ const Explorer = () => {
                                 <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                                     <div className="flex items-center gap-5">
                                         <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center border-2 font-black ${item.threat_level === 'High' ? 'bg-red-500/10 border-red-500/30 text-red-500' :
-                                                item.threat_level === 'Medium' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' :
-                                                    'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+                                            item.threat_level === 'Medium' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' :
+                                                'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
                                             }`}>
                                             <Shield className="w-6 h-6" />
                                         </div>
