@@ -73,6 +73,17 @@ export interface Exposure {
     status: ExposureStatus;
     description?: string;
     remediation_steps?: string;
+    attack_vector?: string; // e.g. 'remote unauthenticated'
+    evidence?: string[];
+    recommended_action?: string;
+}
+
+export interface RiskFactor {
+    id: string;
+    label: string;
+    weight: number;
+    severity: Severity;
+    evidence: string | object;
 }
 
 export interface AssetRelationship {
@@ -89,4 +100,13 @@ export interface AttackPath {
         to: string;
         label: string;
     }>;
+}
+
+export type ScanMode = 'bug_bounty' | 'soc' | 'compliance';
+
+export interface ScanProfile {
+    mode: ScanMode;
+    enableSubnetScan: boolean;
+    weightInfrastructureAge: number;
+    allowAggressiveProbes: boolean;
 }

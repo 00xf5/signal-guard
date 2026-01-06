@@ -23,9 +23,32 @@ const Meta = ({
 }: MetaProps) => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : "https://app.risksignal.name.ng/";
     const fullCanonical = canonical || currentUrl;
-    const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — IP Intelligence & Reputation Audit";
-    const fullDescription = description || "Comprehensive IP risk scoring, real-time port scanning, and vulnerability intelligence. Detect VPN, Proxy, and Tor infrastructure instantly.";
-    const fullKeywords = keywords || "IP WHOIS, Port Scanner Online, DMARC Validator, IP Reputation, VPN Detection, Threat Intelligence, CVE Lookup, Blacklist Checker";
+    const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — Global Attack Surface Management & Forensic Grep Engine";
+
+    // SEO description that covers all core modules: Discovery, Inventory, Forensics, and APIs.
+    const defaultDescription = "RiskSignal is an advanced External Attack Surface Management (EASM) platform. We provide deep forensic IP intelligence, real-time vulnerability scanning, VPN/Proxy detection, and an immutable forensic grep engine for historical network artifacts. Audit domain reputation, scan open ports, and validate security headers instantly.";
+    const fullDescription = description || defaultDescription;
+
+    // Exhaustive keywords covering highly-searched security professional terms.
+    const defaultKeywords = "ASM, EASM, Attack Surface Management, External Attack Surface Management, IP Intelligence, VPN Detection, Proxy Detection, Tor Detection, Forensic Grep Engine, Network Forensics, IP Reputation API, CVE Vulnerability Scanner, Shadow IT Discovery, Domain Reputation audit, Threat Intelligence Feed, Asset Matrix, Risk Engineering, Cyber Risk Scoring, DMARC Validator, Security Headers, WHOIS lookup, Port Scanner online, Botnet Telemetry, Infrastructure Monitoring.";
+    const fullKeywords = keywords || defaultKeywords;
+
+    // Default JSON-LD for the whole application if not provided
+    const defaultJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "RiskSignal",
+        "operatingSystem": "Web",
+        "applicationCategory": "SecurityApplication",
+        "description": defaultDescription,
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    };
+
+    const finalJsonLd = jsonLd || defaultJsonLd;
 
     return (
         <Helmet>
@@ -34,11 +57,14 @@ const Meta = ({
             <meta name="title" content={fullTitle} />
             <meta name="description" content={fullDescription} />
             <meta name="keywords" content={fullKeywords} />
-            <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
+            <meta name="author" content="RiskSignal Labs" />
+            <meta name="theme-color" content="#030712" />
+            <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"} />
             <link rel="canonical" href={fullCanonical} />
 
             {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
+            <meta property="og:site_name" content="RiskSignal" />
             <meta property="og:url" content={fullCanonical} />
             <meta property="og:title" content={fullTitle} />
             <meta property="og:description" content={fullDescription} />
@@ -50,13 +76,12 @@ const Meta = ({
             <meta property="twitter:title" content={fullTitle} />
             <meta property="twitter:description" content={fullDescription} />
             <meta property="twitter:image" content={image} />
+            <meta property="twitter:site" content="@RiskSignal" />
 
-            {/* JSON-LD Structured Data */}
-            {jsonLd && (
-                <script type="application/ld+json">
-                    {JSON.stringify(jsonLd)}
-                </script>
-            )}
+            {/* Standard JSON-LD */}
+            <script type="application/ld+json">
+                {JSON.stringify(finalJsonLd)}
+            </script>
         </Helmet>
     );
 };

@@ -14,8 +14,11 @@ import Discovery from "@/pages/Discovery";
 import IntelDetailed from "@/pages/IntelDetailed";
 import ReputationDetailed from "@/pages/ReputationDetailed";
 import Explorer from "@/pages/Explorer";
+import Forensics from "@/pages/Forensics";
 import Inventory from "@/pages/Inventory";
 import OrgInventory from "@/pages/OrgInventory";
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,9 +40,12 @@ const App = () => (
             <Route path="/discovery" element={<Discovery />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inventory/:id" element={<OrgInventory />} />
+            <Route path="/forensics" element={<Forensics />} />
             <Route path="/explorer" element={<Explorer />} />
             <Route path="/:query/detailed" element={<IntelDetailed />} />
             <Route path="/:query/reputation" element={<ReputationDetailed />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

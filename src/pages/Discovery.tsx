@@ -17,6 +17,7 @@ import { AsmService } from "@/lib/asm-service";
 import { classifyExposure } from "@/lib/taxonomy";
 import DiscoveryTimeline from "@/components/DiscoveryTimeline";
 import DiscoveryTacticalSidebar from "@/components/DiscoveryTacticalSidebar";
+import ThreatIntelligenceFeed from "@/components/ThreatIntelligenceFeed";
 
 const Discovery = () => {
     const [query, setQuery] = useState("");
@@ -28,6 +29,7 @@ const Discovery = () => {
     const [needsHumanVerification, setNeedsHumanVerification] = useState(false);
     const turnstileWidgetId = useRef<string | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isAggressive, setIsAggressive] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const { events, stats } = useThreatFeed();
 
@@ -131,7 +133,11 @@ const Discovery = () => {
             const type = isIp ? 'ip' : 'domain';
 
             const { data, error } = await supabase.functions.invoke('deep-intel', {
-                body: { query: query.trim(), type }
+                body: {
+                    query: query.trim(),
+                    type,
+                    is_aggressive: isAggressive
+                }
             });
 
             if (error) throw error;
@@ -246,9 +252,9 @@ const Discovery = () => {
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <Meta
-                title="Live Threat Discovery Map"
-                description="Monitor global cyber threats in real-time. Track botnet activity, IP reputation spikes, and infrastructure attacks across the globe."
-                keywords="Live Cyber Attack Map, Threat Intelligence, Global Botnet Tracker, Real-time Attack Visualizer, IP Reputation Live"
+                title="Discovery Hub | Real-time Global Threat Intelligence"
+                description="Live threat visualization and real-time IP telemetry tracker. Analyze global botnet activity, malicious IP signatures, and infrastructure reputation in a high-fidelity tactical interface."
+                keywords="threat discovery, botnet tracker, real-time cyber threats, malicious ip map, internet telemetry, attack visualization, reputation intelligence"
                 jsonLd={discoveryJsonLd}
             />
             <Header />
@@ -286,10 +292,42 @@ const Discovery = () => {
                                     {isLoading ? "Scanning..." : "Analyze"}
                                 </Button>
                             </form>
-                            <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1.5"><Globe className="w-3 h-3" /> Real-time DNS</span>
-                                <span className="flex items-center gap-1.5"><ShieldAlert className="w-3 h-3" /> Threat Feeds</span>
-                                <span className="flex items-center gap-1.5"><Activity className="w-3 h-3" /> Behavioral Analysis</span>
+                            <div className="mt-4 flex flex-col items-center gap-4">
+                                <div className="flex items-center gap-6 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1.5"><Globe className="w-3 h-3" /> Real-time DNS</span>
+                                    <span className="flex items-center gap-1.5"><ShieldAlert className="w-3 h-3" /> Threat Feeds</span>
+                                    <span className="flex items-center gap-1.5"><Activity className="w-3 h-3" /> Behavioral Analysis</span>
+                                </div>
+
+                                {/* AGGRESSIVE DISCOVERY TOGGLE */}
+                                <div className="flex flex-col items-center gap-3 p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl max-w-sm w-full transition-all hover:bg-orange-500/10">
+                                    <div className="flex items-center justify-between w-full">
+                                        <div className="flex items-center gap-2">
+                                            <AlertTriangle className={`w-4 h-4 ${isAggressive ? 'text-orange-500 animate-pulse' : 'text-muted-foreground'}`} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Aggressive Discovery</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAggressive(!isAggressive)}
+                                            className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${isAggressive ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' : 'bg-white/10'}`}
+                                        >
+                                            <motion.div
+                                                animate={{ x: isAggressive ? 20 : 2 }}
+                                                className="absolute top-1 w-3 h-3 bg-white rounded-full shadow-sm"
+                                            />
+                                        </button>
+                                    </div>
+                                    {isAggressive && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            className="text-[9px] text-orange-500/80 font-mono text-center leading-tight uppercase"
+                                        >
+                                            ⚠️ Warning: Aggressive discovery may trigger IDS systems.
+                                            Use with explicit owner consent.
+                                        </motion.div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -417,9 +455,9 @@ const Discovery = () => {
                                             Technology Stack
                                         </h3>
                                         <div className="flex flex-wrap gap-2">
-                                            {(result?.technical?.tech_stack || []).map((tech: string, i: number) => (
+                                            {(result?.technical?.tech_stack || []).map((tech: any, i: number) => (
                                                 <span key={i} className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-foreground hover:bg-info/10 transition-colors">
-                                                    {tech}
+                                                    {typeof tech === 'string' ? tech : tech.name}
                                                 </span>
                                             ))}
                                             {(!result?.technical?.tech_stack || result.technical.tech_stack.length === 0) && (
@@ -462,7 +500,7 @@ const Discovery = () => {
                                             Trust Nodes
                                         </h3>
                                         <div className="space-y-2">
-                                            {(result?.intelligence?.reputation_sources || []).map((src: any, i: number) => (
+                                            {(result?.reputation_intel?.reputation_sources || []).map((src: any, i: number) => (
                                                 <div key={i} className="flex justify-between items-center p-2 rounded bg-white/5 border border-white/10">
                                                     <span className="text-[10px] font-bold text-foreground truncate max-w-[100px]">{src.source}</span>
                                                     <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase ${src.status === 'clean' ? 'bg-success/10 text-success border-success/20' : 'bg-danger/10 text-danger border-danger/20'}`}>
@@ -529,39 +567,14 @@ const Discovery = () => {
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-muted/20 border border-white/5 rounded-xl">
-                                    <div className="text-[10px] font-mono text-muted-foreground mb-3 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-info animate-pulse" />
-                                        RECENT INTELLIGENCE
-                                    </div>
-                                    <div className="space-y-2 h-[200px] overflow-hidden relative">
-                                        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-                                        {events.slice(0, 10).map((ev) => (
-                                            <Link
-                                                key={ev.id}
-                                                to={`/${ev.target}/detailed`}
-                                                className="flex justify-between items-center text-[10px] py-1.5 border-b border-white/5 last:border-0 group hover:bg-white/5 transition-colors px-1"
-                                            >
-                                                <div className="flex items-center gap-2 truncate">
-                                                    <span className={`w-1 h-1 rounded-full ${ev.source === 'local' ? 'bg-info animate-pulse' : 'bg-muted-foreground'}`} />
-                                                    <span className="font-mono text-white truncate max-w-[80px]">{ev.target}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5 shrink-0">
-                                                    <span className={`text-[8px] font-bold px-1 rounded-sm border ${ev.source === 'local' ? 'border-info/30 text-info' : 'border-white/10 text-muted-foreground'
-                                                        }`}>
-                                                        {ev.source.toUpperCase()}
-                                                    </span>
-                                                    <span className={`font-bold px-1.2 rounded-sm ${ev.type === 'critical' ? 'bg-danger/20 text-danger' :
-                                                        ev.type === 'suspicious' ? 'bg-warning/20 text-warning' :
-                                                            'bg-success/20 text-success'
-                                                        }`}>
-                                                        {ev.type.toUpperCase()}
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
+                                <ThreatIntelligenceFeed events={events.map(ev => ({
+                                    id: ev.id,
+                                    target: ev.target,
+                                    type: ev.type as any,
+                                    source: ev.source,
+                                    timestamp: new Date().toISOString(), // Fallback if missing
+                                    label: `Observed ${ev.type} activity from ${ev.target}`
+                                }))} />
                             </div>
 
                             {/* Map Container */}

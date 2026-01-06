@@ -1,6 +1,21 @@
-# 🛡️ Signal Guard V2: The Forensic Intelligence Bible
+# 🛡️ RiskSignal V2.5: The Forensic Intelligence Bible
 
-Signal Guard (RiskSignal) is not just a scanner; it is a **Full-Spectrum Attack Surface Management (ASM)** and **Forensic Intelligence Platform**. This document provides an exhaustive technical breakdown of every feature, engine, and logic flow within the system.
+**RiskSignal** is a **Full-Spectrum Attack Surface Management (ASM)** and **Forensic Intelligence Platform**. This document provides an exhaustive technical breakdown of every feature, engine, and logic flow within the system.
+
+---
+
+## 🏗️ System Architecture & Interconnectivity
+
+RiskSignal functions as an autonomous "Intelligence Loop." Understanding how these parts connect is critical for system operation.
+
+### The "Life of a Scan" Flow:
+1.  **Ingestion (Frontend/API)**: A user submits a target (IP/Domain) via the Discovery UI or a REST API call.
+2.  **Orchestration (Edge Function)**: The `deep-intel` function is triggered. It acts as the "Brain," dispatching parallel requests to Shodan, VirusTotal, crt.sh, and direct HTTP probes.
+3.  **Synthesis (Intelligence Layer)**: Raw data is normalized. Banners are synthesized, SSL chains are parsed, and the **Heuristic Risk Engine** runs its weighted calculations.
+4.  **Verification (Database)**: The system checks the `discovery_cache`. If data is "Fresh" (< 1 hour), it returns the cache. If not, it generates a new state.
+5.  **Forensic Anchoring (The Hash Chain)**: The new state is SHA-256 hashed. If the hash differs from the last known state, a record is written to `asset_snapshots` and a "Diff" is calculated for the **Forensic Timeline**.
+6.  **ASM Expansion (Relationship Graph)**: Found entities (e.g., DNS SANs) are passed to the `AsmService`, which creates links between `organizations` and `assets`, growing the attack surface map.
+7.  **Command & Control (Admin)**: Operation logs are fed to the **Live Telemetry** stream, while **Audit Logs** capture any manual intervention (rule toggles, API recharges).
 
 ---
 
@@ -21,97 +36,72 @@ Every scan triggers a synchronized orchestration of global intelligence. The sys
 ## 2. 🧠 The Core Intelligence Engines
 
 ### A. The O(1) Hash Chain (Change Detection)
-To prevent database bloat and track historical "drift," Signal Guard uses a hash-based state management system:
+To prevent database bloat and track historical "drift," RiskSignal uses a hash-based state management system:
 1.  **Normalization:** Incoming data is stripped of transient keys (scan IDs, timestamps) and keys are sorted alphabetically.
 2.  **Hashing:** A SHA-256 hash is generated from the normalized state.
-3.  **Comparison:** The system checks the `latest_snapshot_hash` in the database.
-4.  **Action:**
-    - If **Hash Matches**: The system simply updates `last_seen`. No new data is written.
-    - If **Hash Differs**: A new version is created. The delta is calculated and injected into the **Forensic Timeline**.
+3.  **Action:** If the hash differs from the previous state, a new snapshot version is created, and the delta is injected into the **Forensic Timeline** (`asset_changes` table).
 
-### B. Heuristic Risk Engine
-Risk is calculated as a weighted sum of violations:
-- **WAF Bypass (Critical):** If a proxy (Cloudflare) is present but the direct IP scan exposes administrative ports (22, 3306) or matching service banners.
-- **Infrastructure Age (Medium):** Assets first seen in the last 72 hours are flagged high-risk ("Burner Infrastructure").
-- **Stack Consistency:** Cross-referencing detected technologies across different ports to find "Shadow IT."
+### B. Heuristic Risk Engine (`src/lib/taxonomy.ts`)
+Risk is calculated as a weighted sum of violations using a library of predefined rules:
+- **WAF Bypass (Critical):** Proxy presence vs. Direct IP exposure conflict.
+- **DNS Takeover (Critical):** Dangling infrastructure identifying unclaimed cloud resources.
+- **Infrastructure Age (Medium):** Warning for "Burner" infrastructure seen for < 72 hours.
+- **Technology Drift:** Detects regressions in tech stack (e.g., protocol downgrades).
 
 ### C. Reputation Audit Engine (`src/pages/ReputationDetailed.tsx`)
-Beyond infrastructure, the platform audits the **Trust Profile** of a domain or IP:
-- **Email Security Matrix:**
-    - **SPF (Sender Policy Framework):** Validates outbound mail server authorization.
-    - **DMARC (Domain-based Message Authentication):** Verifies if aggregate reporting and domain alignment are enforced.
-    - **MX (Mail Exchange):** Probes inbound mail routing health and provider trust (e.g., G-Suite vs Private).
-- **Identity & Entity (WHOIS/RDAP):**
-    - Orchestrates lookups across global RDAP registries to determine organization ownership, registry handles, and infrastructure status.
-- **Trust Gauge:** Calculates a percentage-based trust factor by subtracting the normalized Risk Score from 100%.
+Audits the **Trust Profile** of a domain or IP:
+- **Email Security Matrix:** Detailed verification of **SPF**, **DMARC**, and **MX** records.
+- **Identity & Entity (RDAP):** Cross-referencing global registries for organization ownership.
+- **Trust Gauge:** Normalized percentage-based trust factor (100% - Risk Score).
 
-### D. Taxonomy Mapping (`src/lib/taxonomy.ts`)
-Instead of generic "Open Port" alerts, the system uses a taxonomy engine to classify exposures:
-- **EXP-WEB-ADMIN:** Exposed panel detected via banner analysis (e.g., "WordPress Login").
-- **EXP-DB-LEAK:** Database port open with no authentication hint.
-- **EXP-GEN-RISK:** High risk score triggered from cumulative minor factors.
+### D. Forensic Grep Engine (`src/pages/Forensics.tsx`)
+A high-speed investigation tool for searching historical indicators of compromise (IoC) across all snapshots:
+- **JSONB Path Discovery:** Uses advanced PostgreSQL JSONB path querying (`@>`) to search across nested banner data, SSL fields, and headers.
+- **State-Aware Search:** Finds matching artifacts *within* a specific time-slice of an asset's history.
 
 ---
 
-## 3. 🌐 Attack Surface Management (ASM) & Graph Logic
+## 3. 🛡️ Admin Command Center (The Brain)
+
+A dedicated, secure console for platform management located at `/admin/dashboard`.
+
+### Connection to Core Engine:
+- **Rule Toggling**: Admins can enable/disable rules in the `risk_rules` table. The `deep-intel` function reads this table on every execution to decide which heuristics to apply.
+- **API Oversight**: The `api_access` table acts as a gatekeeper for the Edge Functions, enforcing limits configured from the dashboard.
+- **Bulk Matrix**: Ingests raw domains and seeds the `organizations` table, which triggers background discovery for each new entity.
+
+---
+
+## 4. 🌐 Attack Surface Management (ASM) & Graph Logic
 
 The ASM module (`AsmService.ts`) builds a living graph of an organization's digital footprint.
 
-### Asset Ownership Confidence
-The system automatically assigns confidence scores to discovered assets:
-- **Root Domain Match:** 100%
-- **Cert SAN (Subject Alternative Name) Match:** 95%
-- **Subdomain Match:** 90%
-- **IP Hosted Match:** 85%
-- **Passive DNS / PTR Link:** 70%
-- **Subnet Proximity:** 40%
-
-### Passive Discovery Expansion
-During a scan, the system "Pivots" to find related infrastructure:
-1.  **TLS Pivot:** Every name in the SSL certificate's SAN list is automatically added to the organization's inventory.
-2.  **Passive DNS Pivot:** Historical domains associated with the IP are tracked and linked.
-3.  **Subnet Enumeration (Phase F):** Probes the `/24` range of the target IP, looking for PTR record patterns (e.g., `dev.client-name.com`) to identify sibling servers.
+### Data Interconnectivity:
+- **`organizations` ↔ `assets`**: A many-to-many relationship using a junction table or foreign keys, representing ownership.
+- **Asset Ownership Confidence**: The system calculates a score (0-100) based on how the link was discovered (e.g., direct DNS vs. subnet proximity).
+- **Passive Discovery Expansion**: SAN extraction from SSL certificates automatically triggers new "Discovery" events if a previously unknown domain is found.
 
 ---
 
-## 4. 📟 Frontend: The HUD & Tactical Interfaces
+## 5. 📟 Tactical UI & Mobile UX
 
-The UI is designed as a "High-Fidelity Cyber HUD" for security analysts.
-
-### A. Discovery Tactical Sidebar
-- **Global Heat Index:** A real-time visualizer of "Threats Detected Today" vs "Safe Network Nodes."
-- **Intel Frequencies (Frequency List):** A persistent history of your recent scans, stored in `localStorage`, allowing for instant re-scanning and state comparison.
-- **Edge Latency Matrix:** Real-time health statistics of the core scanning infrastructure.
-
-### B. Forensic Timeline
-- A linear visualization of every change an asset has undergone.
-- Categorized by **Network**, **Application**, **Infrastructure**, and **Security**.
-- Each entry shows a "Diff View" (Old Value vs New Value).
-
-### C. Subnet Matrix
-- Visualizes the surrounding IP addresses in a grid.
-- Allows analysts to see if they are dealing with an isolated host or a cluster of related infrastructure.
+- **Interactive Asset Pivoting**: Every technical entity is wrapped in the `ClickableAsset` component. This component acts as a "Router Pivot," allowing analysts to jump from a Reputation view to a Detailed Intel view with a single click.
+- **Tactical Sidebars (HUDs)**:
+    - **Shared Context**: Sidebars maintain state (like `fullIntel`) across different sub-pages for seamless navigation.
+    - **Responsiveness**: HUDs use `framer-motion` for hardware-accelerated transitions on mobile devices.
 
 ---
 
-## 5. 🛡️ Bot Evasion & Human Verification
+## �️ Database Schema Relationships
 
-Signal Guard implements a multi-tier defense system to prevent API abuse:
-1.  **Risk Detection:** On the Discovery page, the system checks the visitor's IP using `ipwho.is`.
-2.  **Triggering:** If the user is on a **VPN, Proxy, Tor, or Datacenter IP**, the `isRiskyUser` flag is set to true.
-3.  **The Challenge:** A **Cloudflare Turnstile** modal is force-rendered. No scans can be performed until a cryptographic human challenge is solved.
-
----
-
-## 🗄️ Database Architecture (The Digital Spine)
-
-- **`organizations`**: Root entities for grouping assets.
-- **`assets`**: The global registry of every IP and Domain found.
-- **`asset_snapshots`**: The historical record of serialized states.
-- **`asset_relationships`**: The "Links" (e.g., `Domain hosted_on IP`).
-- **`exposures`**: The verified findings linked to assets.
-- **`discovery_cache`**: High-performance cache for recent scan results.
+| Table | Primary Role | Relationships |
+| :--- | :--- | :--- |
+| **`organizations`** | Core Entity | Owns many `assets`. |
+| **`assets`** | Target Node | Belongs to `organizations`, has many `snapshots`. |
+| **`asset_snapshots`** | Point-in-time state | Linked to `assets`. Defines the "Forensic State." |
+| **`asset_changes`** | The "Diff" | Calculated between two `asset_snapshots`. |
+| **`risk_rules`** | Logic Configuration | Applied by `deep-intel` to generate `risk_findings`. |
 
 ---
 
-*Signal Guard V2 - Engineering Ops Manual*
+*RiskSignal V2.5 - Engineering Ops Manual*

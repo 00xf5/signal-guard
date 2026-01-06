@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Meta from "@/components/Meta";
+import ClickableAsset from "@/components/ClickableAsset";
 import IntelTacticalSidebar from "@/components/IntelTacticalSidebar";
 import { AsmService } from "@/lib/asm-service";
 import { classifyExposure } from "@/lib/taxonomy";
@@ -89,6 +90,11 @@ const DataRow = ({ label, value, copyable = false, onClick, icon: Icon }: { labe
         toast.success(`Copied ${label}`);
     };
 
+    const isAsset = typeof value === 'string' && (
+        /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value) ||
+        (value.includes('.') && !value.includes(' ') && value.length > 3)
+    );
+
     return (
         <div
             className={`flex items-baseline justify-between group ${onClick ? 'cursor-pointer hover:text-info transition-colors' : ''}`}
@@ -96,7 +102,11 @@ const DataRow = ({ label, value, copyable = false, onClick, icon: Icon }: { labe
         >
             <span className="text-[10px] text-muted-foreground font-mono uppercase">{label}</span>
             <div className="flex items-center gap-2 max-w-[70%] text-right justify-end">
-                <span className="text-[10px] text-foreground font-mono break-all group-hover:text-info transition-colors">{value}</span>
+                {isAsset && !onClick ? (
+                    <ClickableAsset value={value} className="text-[10px] font-mono" showIcon={false} />
+                ) : (
+                    <span className="text-[10px] text-foreground font-mono break-all group-hover:text-info transition-colors">{value}</span>
+                )}
                 {Icon && <Icon className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-all text-info" />}
                 {copyable && !onClick && (
                     <button onClick={handleCopy} className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -380,7 +390,9 @@ const IntelDetailed = () => {
                                     </div>
                                     <div>
                                         <div className="text-[10px] text-muted-foreground/80 uppercase font-mono tracking-widest">Target IP</div>
-                                        <div className="text-xl font-black text-foreground">{data?.network_context?.resolved_ip}</div>
+                                        <div className="text-xl font-black text-foreground">
+                                            <ClickableAsset value={data?.network_context?.resolved_ip} />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5">
@@ -494,16 +506,16 @@ const IntelDetailed = () => {
                                     {subnetIps.map((ip) => {
                                         const isMain = ip === data?.network_context?.resolved_ip;
                                         return (
-                                            <Link
-                                                key={ip}
-                                                to={`/${ip}/detailed`}
+                                            <ClickableAsset
+                                                value={ip}
                                                 className={`h-7 flex items-center justify-center text-[9px] font-mono border transition-all ${isMain
                                                     ? 'bg-info border-info text-black font-black z-10'
                                                     : 'bg-terminal-bg/30 border-panel-border text-muted-foreground/80 hover:border-muted-foreground hover:text-foreground/80'
                                                     }`}
+                                                showIcon={false}
                                             >
                                                 .{ip.split('.').pop()}
-                                            </Link>
+                                            </ClickableAsset>
                                         );
                                     })}
                                 </div>
@@ -535,38 +547,61 @@ const IntelDetailed = () => {
 
                         <div className="p-10 border-b border-panel-border bg-panel-bg/50 grid-bg">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                                {/* RISK SCORE ENGINE */}
+                                {/* RISK SCORE ENGINE - ATTRIBUTION TREE */}
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="p-8 bg-terminal-bg/20 border border-panel-border rounded-3xl relative overflow-hidden group hover:border-info/30 transition-all duration-500"
                                 >
-                                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
-                                        <ShieldAlert className="w-20 h-20" />
+                                    <div className="absolute top-0 right-0 p-4 opacity-5 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
+                                        <ShieldAlert className="w-24 h-24" />
                                     </div>
                                     <div className="flex items-center justify-between mb-6">
-                                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Risk Score</span>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Total_Risk_Exposure</span>
+                                            <span className="text-[8px] font-mono text-muted-foreground/40 uppercase">Engine_V2.1_CORE</span>
+                                        </div>
                                         <div className="flex items-center gap-1">
-                                            {[1, 2, 3, 4, 5].map(i => (
-                                                <div key={i} className={`w-1 h-3 rounded-full ${i <= (data?.summary?.risk_score / 20) ? 'bg-info shadow-[0_0_5px_rgba(30,144,255,0.5)]' : 'bg-foreground/10'}`} />
+                                            {[...Array(5)].map((_, i) => (
+                                                <div key={i} className={`w-1.5 h-4 rounded-full transition-all duration-700 ${i <= (data?.summary?.risk_score / 20) ? (data?.summary?.risk_score > 70 ? 'bg-red-500 shadow-[0_0_8px_#ef4444]' : 'bg-info shadow-[0_0_8px_#1e90ff]') : 'bg-foreground/10'}`} />
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className={`text-6xl font-black tracking-tighter ${data?.summary?.risk_score > 70 ? 'text-red-500' :
+
+                                    <div className="flex items-baseline gap-2 mb-8">
+                                        <span className={`text-7xl font-black tracking-tighter leading-none ${data?.summary?.risk_score > 70 ? 'text-red-500' :
                                             data?.summary?.risk_score > 35 ? 'text-orange-500' : 'text-emerald-500'
                                             }`}>
                                             {data?.summary?.risk_score}
                                         </span>
-                                        <span className="text-muted-foreground font-mono text-xl">/100</span>
+                                        <span className="text-muted-foreground/40 font-mono text-xl">%</span>
                                     </div>
-                                    <div className="mt-4 flex flex-wrap gap-2">
-                                        {(data?.summary?.risk_breakdown || []).map((item: any, i: number) => (
-                                            <div key={i} className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded text-[8px] font-mono text-muted-foreground uppercase">
-                                                <div className={`w-1 h-1 rounded-full ${item.impact === 'high' ? 'bg-red-500' : item.impact === 'medium' ? 'bg-orange-500' : 'bg-emerald-500'}`} />
-                                                {item.label}
-                                            </div>
-                                        ))}
+
+                                    {/* RISK ATTRIBUTION LEDGER */}
+                                    <div className="space-y-2 mt-4">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="h-[1px] flex-grow bg-foreground/5" />
+                                            <span className="text-[9px] font-mono text-muted-foreground/60 uppercase tracking-widest">Attribution_Ledger</span>
+                                            <div className="h-[1px] flex-grow bg-foreground/5" />
+                                        </div>
+                                        <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {(data?.summary?.risk_breakdown || []).map((item: any, i: number) => (
+                                                <div key={i} className="flex items-center justify-between py-1 border-b border-white/[0.02] group/item">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`w-1 h-3 rounded-full ${item.severity === 'critical' ? 'bg-red-500' :
+                                                            item.severity === 'high' ? 'bg-orange-500' :
+                                                                item.severity === 'medium' ? 'bg-yellow-500' : 'bg-info'
+                                                            }`} />
+                                                        <span className="text-[10px] font-mono text-foreground/70 group-hover/item:text-foreground transition-colors truncate max-w-[140px]">
+                                                            {item.label}
+                                                        </span>
+                                                    </div>
+                                                    <span className={`text-[10px] font-mono font-bold ${item.weight > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                        {item.weight > 0 ? `+${item.weight}` : item.weight}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
 

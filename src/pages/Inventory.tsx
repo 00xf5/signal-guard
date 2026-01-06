@@ -11,11 +11,15 @@ import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { Organization } from "@/types/asm";
 import Meta from "@/components/Meta";
+import InventoryTacticalSidebar from "@/components/InventoryTacticalSidebar";
+import ClickableAsset from "@/components/ClickableAsset";
+import { Terminal } from "lucide-react";
 
 const Inventory = () => {
     const [orgs, setOrgs] = useState<Organization[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,8 +45,9 @@ const Inventory = () => {
     return (
         <div className="min-h-screen bg-app-bg text-foreground/80 font-sans">
             <Meta
-                title="ASM Inventory | RiskSignal"
-                description="Manage and monitor your organization's attack surface and asset graph."
+                title="Inventory Control | Attack Surface Management Matrix"
+                description="Comprehensive asset inventory and attack surface mapping. Monitor domain graphs, IP ranges, and shadow IT infrastructure across your entire organization."
+                keywords="attack surface management, asm, easm, shadow it detection, asset inventory graph, infrastructure monitoring, risk management dashboard"
             />
             <Header />
 
@@ -111,7 +116,7 @@ const Inventory = () => {
                                 <div>
                                     <h3 className="text-xl font-black text-foreground mb-1 group-hover:text-info transition-colors">{org.name}</h3>
                                     <div className="flex items-center gap-2 text-muted-foreground text-xs font-mono">
-                                        <Globe className="w-3 h-3" /> {org.root_domain}
+                                        <Globe className="w-3 h-3" /> <ClickableAsset value={org.root_domain} showIcon={false} />
                                     </div>
                                 </div>
 
@@ -149,6 +154,20 @@ const Inventory = () => {
             </main>
 
             <Footer />
+
+            <InventoryTacticalSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                orgsCount={orgs.length}
+            />
+
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="fixed bottom-6 left-6 lg:hidden w-14 h-14 bg-info text-black rounded-full shadow-[0_0_30px_rgba(30,144,255,0.3)] flex items-center justify-center z-[90] active:scale-95 transition-transform border-4 border-background"
+            >
+                <Terminal className="w-6 h-6" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background animate-pulse" />
+            </button>
         </div>
     );
 };

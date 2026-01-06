@@ -10,6 +10,7 @@ const Header = () => {
   const navLinks = [
     { name: "Discovery", href: "/discovery", icon: Globe, color: "text-success" },
     { name: "Inventory", href: "/inventory", icon: Database, color: "text-info" },
+    { name: "Forensics", href: "/forensics", icon: Shield, color: "text-warning" },
     { name: "About", href: "/about", icon: Info, color: "text-muted-foreground" },
     { name: "Docs", href: "/docs", icon: Code, color: "text-muted-foreground" },
   ];

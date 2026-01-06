@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Meta from "@/components/Meta";
+import ClickableAsset from "@/components/ClickableAsset";
+import IntelTacticalSidebar from "@/components/IntelTacticalSidebar";
 
 const TrustGauge = ({ score, label, color }: { score: number, label: string, color: string }) => {
     const radius = 45;
@@ -160,6 +162,7 @@ const ReputationDetailed = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<any>(null);
     const [fullIntel, setFullIntel] = useState<any>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const reputationJsonLd = {
         "@context": "https://schema.org",
@@ -268,7 +271,9 @@ const ReputationDetailed = () => {
                         <div className="h-6 w-[1px] bg-foreground/10" />
                         <div className="flex flex-col">
                             <span className="text-[9px] font-mono text-muted-foreground/80 uppercase tracking-widest">Audit Target</span>
-                            <span className="text-sm font-black text-foreground uppercase tracking-tight">{query}</span>
+                            <span className="text-sm font-black text-foreground uppercase tracking-tight">
+                                <ClickableAsset value={query || ''} />
+                            </span>
                         </div>
                     </div>
                     <div className="hidden md:flex items-center gap-3">
@@ -306,7 +311,7 @@ const ReputationDetailed = () => {
                                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                                     <div className="px-3 py-1.5 bg-terminal-bg/50 border border-panel-border rounded-lg flex items-center gap-2">
                                         <Globe className="w-3 h-3 text-info" />
-                                        <span className="text-[10px] font-mono">{fullIntel?.network_context?.resolved_ip}</span>
+                                        <ClickableAsset className="text-[10px] font-mono" value={fullIntel?.network_context?.resolved_ip} />
                                     </div>
                                     <div className="px-3 py-1.5 bg-terminal-bg/50 border border-panel-border rounded-lg flex items-center gap-2">
                                         <Server className="w-3 h-3 text-info" />
@@ -383,7 +388,8 @@ const ReputationDetailed = () => {
                                     <div className="space-y-2">
                                         {(data?.email_security?.mx || []).slice(0, 5).map((mx: string, i: number) => (
                                             <div key={i} className="text-[10px] font-mono text-foreground/70 flex items-start gap-2 break-all">
-                                                <div className="w-1 h-1 bg-emerald-500/50 rounded-full mt-1.5 shrink-0" /> {mx}
+                                                <div className="w-1 h-1 bg-emerald-500/50 rounded-full mt-1.5 shrink-0" />
+                                                <ClickableAsset value={mx} showIcon={false} />
                                             </div>
                                         ))}
                                         {data?.email_security?.mx?.length === 0 && <span className="text-[10px] font-mono text-muted-foreground italic">No MX records identified</span>}
@@ -485,6 +491,20 @@ const ReputationDetailed = () => {
             </main>
 
             <Footer />
+
+            <IntelTacticalSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                data={fullIntel}
+            />
+
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="fixed bottom-6 left-6 lg:hidden w-14 h-14 bg-info text-black rounded-full shadow-[0_0_30px_rgba(30,144,255,0.3)] flex items-center justify-center z-[90] active:scale-95 transition-transform border-4 border-background"
+            >
+                <Terminal className="w-6 h-6" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-background animate-pulse" />
+            </button>
         </div>
     );
 };

@@ -75,9 +75,9 @@ const DiscoveryTacticalSidebar: React.FC<DiscoverySidebarProps> = ({
                                         <Database className="w-4 h-4 text-info" />
                                         <span className="text-xs font-bold text-foreground group-hover:text-info">Inventory</span>
                                     </Link>
-                                    <Link to="/about" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
-                                        <Info className="w-4 h-4 text-muted-foreground" />
-                                        <span className="text-xs font-bold text-foreground">About</span>
+                                    <Link to="/forensics" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-warning/30 transition-all group">
+                                        <Shield className="w-4 h-4 text-warning" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-warning">Forensics</span>
                                     </Link>
                                     <Link to="/docs" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
                                         <Code className="w-4 h-4 text-muted-foreground" />

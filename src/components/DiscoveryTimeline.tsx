@@ -136,7 +136,7 @@ const DiscoveryTimeline: React.FC<DiscoveryTimelineProps> = ({ version, changes,
                     </div>
                 )}
 
-                {/* 2. Risk Findings (Static but snapshot-linked) */}
+                {/* 2. Risk Findings (Taxonomy-driven) */}
                 {findings.map((finding, i) => (
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -145,23 +145,48 @@ const DiscoveryTimeline: React.FC<DiscoveryTimelineProps> = ({ version, changes,
                         key={`finding-${i}`}
                         className="relative"
                     >
-                        <div className="absolute -left-8 top-1.5 w-6 h-6 rounded-full bg-background border-2 border-danger flex items-center justify-center z-10 shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                        <div className="absolute -left-8 top-2 w-6 h-6 rounded-full bg-background border-2 border-danger flex items-center justify-center z-10 shadow-[0_0_10px_rgba(239,68,68,0.4)]">
                             <AlertCircle className="w-3 h-3 text-danger animate-pulse" />
                         </div>
-                        <div className="p-4 rounded-xl border border-danger/10 bg-black/40 backdrop-blur-sm group hover:border-danger/30 transition-all">
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-[10px] font-black p-1 px-2 rounded bg-danger/20 text-danger uppercase tracking-tighter">
-                                    HEURISTIC VIOLATION
-                                </span>
-                                <span className="text-[14px] font-black text-danger">+{finding.calculated_score}</span>
-                            </div>
-                            <div className="space-y-2">
-                                <p className="text-sm font-bold text-foreground opacity-90 capitalize">
-                                    {finding.rule_id ? finding.rule_id.split('-').join(' ') : 'Security Risk Detected'}
-                                </p>
-                                <div className="p-2 rounded bg-white/5 text-[10px] font-mono text-muted-foreground border border-white/5">
-                                    EVIDENCE: {JSON.stringify(finding.evidence)}
+                        <div className="p-5 rounded-xl border border-danger/10 bg-black/40 backdrop-blur-sm group hover:border-danger/30 transition-all space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[9px] font-black p-1 px-2 rounded bg-danger/20 text-danger uppercase tracking-tighter">
+                                        {finding.taxonomy_id || 'EXP-GEN-RISK'}
+                                    </span>
+                                    {finding.attack_vector && (
+                                        <span className="text-[8px] font-mono text-muted-foreground uppercase opacity-50">
+                                            VEC: {finding.attack_vector}
+                                        </span>
+                                    )}
                                 </div>
+                                <span className={`text-[14px] font-black ${finding.weight > 0 ? 'text-danger' : 'text-success'}`}>
+                                    {finding.weight > 0 ? `+${finding.weight}` : finding.weight}
+                                </span>
+                            </div>
+
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold text-foreground opacity-95">
+                                    {finding.label || 'Security Risk Detected'}
+                                </h4>
+                                {finding.description && (
+                                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                        {finding.description}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="p-2.5 rounded bg-white/5 text-[10px] font-mono text-muted-foreground border border-white/5 space-y-2">
+                                <div className="flex gap-2">
+                                    <span className="text-foreground/40 uppercase font-black tracking-widest text-[8px]">Evidence:</span>
+                                    <span className="break-all">{typeof finding.evidence === 'object' ? JSON.stringify(finding.evidence) : finding.evidence}</span>
+                                </div>
+                                {finding.remediation && (
+                                    <div className="pt-2 border-t border-white/5 flex gap-2">
+                                        <span className="text-info/60 uppercase font-black tracking-widest text-[8px]">Remediation:</span>
+                                        <span className="text-info/80">{finding.remediation}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </motion.div>
