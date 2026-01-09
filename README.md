@@ -1,92 +1,93 @@
-# RiskSignal - Real-Time Forensic IP Intelligence & Attack Surface Management (ASM)
+# 🛡️ RiskSignal: Autonomous Attack Surface Management & Forensic Intelligence
 
-[![RiskSignal Live](https://img.shields.io/badge/Live-RiskSignal-blue?style=for-the-badge)](https://app.risksignal.name.ng/)
+![RiskSignal Banner](https://img.shields.io/badge/RiskSignal-Intelligence_Operations-success?style=for-the-badge&logo=shodan)
+![Status](https://img.shields.io/badge/Status-Operational-blue?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-AES--256-blueviolet?style=for-the-badge)
 
-**RiskSignal** is an intelligence platform for developers and security specialists. It converts network telemetry into actionable insights, combining port scanning, CVE mapping, and Attack Surface Management (ASM).
-
----
-
-## Core Intelligence Modules
-
-RiskSignal uses a state-based engine to identify infrastructure changes.
-
-### 1. Forensic ASM & Change Detection
-- **Data Sources:** Shodan, VirusTotal, crt.sh (Certificate Transparency).
-- **Functionality:** Every scan state is hashed (SHA-256). The system identifies exact deltas and records them in the asset timeline.
-- **Subdomain Discovery:** Recursive lookup of Certificate Transparency logs to find development environments and shadow IT.
-
-### 2. Service Fingerprinting
-- **Technique:** Forensic banner synthesis from HTTP headers and SSL handshakes.
-- **Intelligence:** Automatically maps ports to services like OpenSSH, Nginx, MySQL, and LiteSpeed.
-
-### 3. Heuristic Risk Engine
-- **WAF Bypass Detection:** Flags exposed IPs associated with WAF-protected domains.
-- **DNS Takeover Risk:** Identifies dangling CNAME records.
-- **Infrastructure Age:** Warnings for SSL certificates issued in the last 72 hours.
-
-### 4. Reputation & Intelligence
-- **Data Sources:** VirusTotal & IPWhois.
-- **Feature:** Identifies malicious scanners and checks against 70+ blocklists.
-- **Geo-Forensics:** ISP/ASN mapping and 3D coordinate visualization.
+**RiskSignal** is a state-of-the-art Cyber-Asset Attack Surface Management (CAASM) and forensic intelligence platform. It converts fragmented network telemetry, certificate logs, and JavaScript logic into a unified, actionable security posture. Designed for high-speed intelligence operations, RiskSignal enables security teams to identify, track, and mitigate threats across their entire digital footprint in real-time.
 
 ---
 
-## Tactical UI & UX
+## 🛰️ Mission Control Overview
 
-- **Asset Pivot:** Clickable IP addresses, domains, and records for direct investigation.
-- **Mobile HUD:** Dedicated sidebars for Discovery, Inventory, and Forensics.
-- **Forensic History:** Retains recent queries for instant drift analysis.
+RiskSignal's architecture is built on the principle of **Autonomous Visibility**. By distributing reconnaissance tasks into high-performance kernels, the platform provides a continuous "Satellite View" of global infrastructure, detecting deltas and vulns the moment they manifest.
 
----
-
-## Admin Command Center
-- **Risk Policy Engine:** Toggle forensic rules on/off.
-- **Audit Logging:** Immutable record of administrative actions.
-- **Bulk Importer:** Ingest domains for organization-wide monitoring.
-- **API Commander:** Manage developer keys and monitor telemetry.
+### 🧩 Core Capabilities
+*   **JS-ASM ELITE Engine**: A deep-forensic analysis system that de-minifies and parses JavaScript at scale to reveal hidden API routes and leaked credentials.
+*   **Forensic State Hashing**: Implements SHA-256 state-anchoring to detect even the most subtle "infrastructure drift."
+*   **Shadow IT Discovery**: Recursive monitoring of Certificate Transparency (CT) logs to unearth unmanaged assets.
+*   **Tactical HUD Architecture**: A data-dense, Shodan-inspired interface optimized for rapid response and ergonomic data ingestion.
+*   **Asynchronous Intelligence Loop**: Uses specialized edge-triggers and background extraction to bypass traditional cloud latency.
 
 ---
 
-## Data Source Orchestration
+## 🚀 Intelligence Modules
 
-| Provider | Role |
+### 🔬 1. Tactical JS Intelligence
+The premier module for modern web reconnaissance.
+- **Endpoint Extraction**: Maps hidden API paths (GET/POST/PUT) and flags dangerous routes like `/v1/auth` or `/admin`.
+- **Secret Miner**: Sophisticated pattern matching for 120+ secret types (AWS, Stripe, JWT, Google Cloud, etc.).
+- **Forensic Tagging**: Automatically attributes assets with high-signal tags like `XSS-CANDIDATE`, `INTERNAL-LEAK`, or `BYPASS-SIGNAL`.
+
+### 🔎 2. Forensic Discovery (Deep Intel)
+Converges global data streams into a single forensic pane:
+- **Port & Service Mapping**: Shodan-integrated port discovery with forensic banner synthesis.
+- **Reputation Audit**: Real-time cross-referencing against 70+ malicious IP blocklists.
+- **Geo-Forensics**: Precision ASN mapping and 3D geographic coordinate visualization.
+
+### 🗃️ 3. Inventory & Drift Analysis
+- **Snapshot Chronology**: Automatic point-in-time recording of asset states.
+- **The Forensic Diff**: Instantly calculates the delta between any two scan events to show precisely what changed.
+- **Risk Gravity Scoring**: Weighted heuristic engine that calculates a "Trust Gauge" based on infrastructure health.
+
+---
+
+## 🛠️ Technology Stack & Dependencies
+
+| Layer | Technology |
 | :--- | :--- |
-| **Shodan** | Port discovery and vulnerability detection |
-| **VirusTotal** | Reputation and passive DNS |
-| **crt.sh** | Certificate Transparency logs |
-| **IPWhois** | ASN connectivity and geographic placement |
-| **HTTP Engine** | Tech-stack profiling and security audit |
+| **Frontend Framework** | React 18 / Vite / TypeScript |
+| **Styling & UI** | Tailwind CSS / Radix UI / Lucide |
+| **Backend / Serverless** | Supabase (PostgreSQL / Edge Functions) |
+| **Extraction Kernel** | Node.js ESM Cluster (Render) |
+| **Alerting** | Discord Webhook Architecture |
+| **Security** | Supabase Auth / Vault / RLS |
 
 ---
 
-## Deployment & Setup
+## ⚙️ Quick Start Deployment
 
-1. **Clone the Repo:**
-   ```bash
-   git clone https://github.com/00xf5/signal-guard.git
-   ```
-2. **Setup Environment:**
-   Configure `.env` with:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-3. **Deploy Backend:**
-   ```bash
-   supabase functions deploy deep-intel --no-verify-jwt
-   ```
-4. **Run Application:**
-   ```bash
-   npm install && npm run dev
-   ```
+For a full guided setup, see the **[LOCAL_README.md](./LOCAL_README.md)**.
 
----
+1.  **Clone Repository**:
+    ```bash
+    git clone https://github.com/00xf5/signal-guard.git
+    cd signal-guard
+    ```
 
-## API for Developers
-```bash
-curl -X POST "https://[YOUR_SUPABASE_URL]/functions/v1/deep-intel" \
-     -H "Authorization: Bearer [SERVICE_ROLE_KEY]" \
-     -d '{"query": "example.com"}'
-```
+2.  **Environment Sync**:
+    Copy `.env.example` to `.env` and populate your Supabase and Satellite credentials.
+
+3.  **Kernel Deployment**:
+    Deploy the core Edge Functions to your Supabase project:
+    ```bash
+    npx supabase functions deploy jsasm-tactical --no-verify-jwt
+    npx supabase functions deploy deep-intel --no-verify-jwt
+    ```
+
+4.  **Schema Preparation**:
+    Apply the forensic database migrations via the Supabase SQL Editor or CLI.
 
 ---
 
-© 2026 RiskSignal Intelligence Ops.
+## 📜 Technical Documentation
+
+RiskSignal maintains exhaustive documentation for all operational tiers:
+- **[LOCAL_README.md](./LOCAL_README.md)**: 700% Detailed Feature & Component Breakdown.
+- **[Docs.md](./Docs.md)**: (MASTER) Thorough project documentation and logic explanations.
+- **[ENGINEERING_DOCS.md](./ENGINEERING_DOCS.md)**: Architecture, Security, and Core Logic flows.
+
+---
+
+© 2026 RiskSignal Intelligence Operations. Built for the relentless pursuit of visibility.
+"Build to see what is hidden."

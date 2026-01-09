@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Globe, ShieldAlert, Cpu, Activity, Map, Lock, Server, AlertTriangle, ExternalLink, Clock, Terminal } from "lucide-react";
+import { Search, Globe, ShieldAlert, Cpu, Activity, Map, Lock, Server, AlertTriangle, ExternalLink, Clock, Terminal, Zap } from "lucide-react";
 import { toast } from "sonner";
 import SEOContent from "@/components/SEOContent";
 
@@ -37,10 +37,10 @@ const Discovery = () => {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "RiskSignal Discovery",
-        "url": "https://risksignal-tau.vercel.app/discovery",
-        "description": "Real-time global threat visualization and botnet telemetry tracker.",
+        "url": "https://app.risksignal.name.ng/discovery",
+        "description": "Real-time global attack surface visualization and threat intelligence tracker.",
         "applicationCategory": "SecurityApplication",
-        "featureList": ["Live Threat Map", "Real-time Attack Visualizer", "Global IP Traffic Analysis"]
+        "featureList": ["Live Infrastructure Map", "Attack Path Visualizer", "Global Reconnaissance Feed"]
     };
 
     useEffect(() => {
@@ -68,7 +68,6 @@ const Discovery = () => {
         }
     }, [result, query]);
 
-    // Check user risk level on mount
     useEffect(() => {
         const checkUserIP = async () => {
             try {
@@ -242,8 +241,8 @@ const Discovery = () => {
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <Meta
-                title="Discovery Hub | Real-time Global Threat Intelligence"
-                description="Live threat visualization and real-time IP telemetry tracker. Analyze global botnet activity, malicious IP signatures, and infrastructure reputation in a high-fidelity tactical interface."
+                title="Global Attack Surface Discovery | Infrastructure Mapping"
+                description="Live reconnaissance dashboard for mapping global infrastructure and digital footprints. Real-time visualization of discovered assets and threat gravity."
                 keywords="threat discovery, botnet tracker, real-time cyber threats, malicious ip map, internet telemetry, attack visualization, reputation intelligence"
                 jsonLd={discoveryJsonLd}
             />
@@ -386,10 +385,13 @@ const Discovery = () => {
                                                 {result.network_context.asn.organization}
                                             </span>
                                         )}
-                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-background border border-border text-xs font-medium text-foreground">
-                                            <Cpu className="w-3.5 h-3.5 text-muted-foreground" />
-                                            {result?.network_context?.infrastructure_type || 'Unknown'}
-                                        </span>
+                                        <Link
+                                            to={`/tactical-js?domain=${result?.meta?.target}`}
+                                            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 border border-success/30 text-[10px] font-black text-success uppercase tracking-widest hover:bg-success/20 transition-all hover:scale-105"
+                                        >
+                                            <Zap className="w-3 h-3" />
+                                            Tactical JS Probe
+                                        </Link>
                                     </div>
                                 </div>
 

@@ -23,11 +23,11 @@ const ApiAccess = () => {
     const apiJsonLd = {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "RiskSignal Trust API",
+        "name": "RiskSignal Intelligence API",
         "url": "https://app.risksignal.name.ng/api-access",
-        "description": "Professional Forensic Trust API. Scale your entity verification with high-fidelity signal analysis.",
+        "description": "Enterprise-grade Attack Surface Intelligence API. Scale your infrastructure reconnaissance with high-fidelity signal analysis.",
         "applicationCategory": "SecurityApplication",
-        "featureList": ["Forensic Trust Scoring", "Confidence Gauges", "Legitimacy Verification", "Usage Guarantees"]
+        "featureList": ["Infrastructure Mapping", "Asset Discovery", "Risk Telemetry", "Managed Exposure Alerts"]
     };
 
     const generateApiKey = () => {
@@ -101,9 +101,9 @@ const ApiAccess = () => {
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
             <Meta
-                title="Trust Intelligence API Access | Enterprise Fraud Prevention"
-                description="Professional Trust Intelligence API. Scale your risk analysis, entity verification, and fraud prevention with 500+ high-fidelity biometric and network signals."
-                keywords="Trust API, Fraud Prevention API, Vendor Risk Management, IP Risk Score API, KYC verification API, deep forensic signals, Enterprise security API"
+                title="Intelligence API Access | Attack Surface Reconnaissance"
+                description="Professional Infrastructure Intelligence API. Scale your asset discovery, risk analysis, and exposure monitoring with high-fidelity reconnaissance signals."
+                keywords="Intelligence API, Attack Surface API, ASM API, Infrastructure Recon, Asset Discovery API, Security Intelligence API"
                 jsonLd={apiJsonLd}
             />
             <Header />
@@ -117,11 +117,11 @@ const ApiAccess = () => {
                 <div className="space-y-12">
                     <div className="space-y-4 text-center md:text-left">
                         <h1 className="text-4xl sm:text-6xl font-black tracking-tighter italic">
-                            Access the <span className="text-info">Trust API.</span>
+                            Access the <span className="text-info">Intelligence API.</span>
                         </h1>
                         <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed mx-auto md:mx-0">
-                            Integrate professional forensic intelligence into your own infrastructure.
-                            Each developer key is pre-loaded with <span className="text-foreground font-black">500 free signals.</span>
+                            Integrate professional infrastructure intelligence into your own security workflow.
+                            Each developer key is pre-loaded with <span className="text-foreground font-black">500 free checks.</span>
                         </p>
                     </div>
 

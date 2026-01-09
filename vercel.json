@@ -5,8 +5,8 @@
             "destination": "/api/$1"
         },
         {
-            "source": "/((?!api/|.*\\..*).*)",
-            "destination": "/"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [

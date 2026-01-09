@@ -16,7 +16,7 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
-*.sql
+*sql
 .DS_Store
 *.suo
 *.ntvs*
@@ -32,3 +32,4 @@ schema.sql
 
 # Supabase
 supabase/
+LOCAL_README.md

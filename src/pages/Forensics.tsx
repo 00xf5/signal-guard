@@ -69,7 +69,7 @@ const Forensics = () => {
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.length < 3) {
-            toast.error("Term too short. Minimum 3 characters for forensic grep.");
+            toast.error("Term too short. Minimum 3 characters for archive grep.");
             return;
         }
 
@@ -77,8 +77,6 @@ const Forensics = () => {
         setResults([]);
 
         try {
-            // Using PostgREST path search for JSONB
-            // This is a deep search across the snapshot_data object
             const { data, error } = await supabase
                 .from('asset_snapshots')
                 .select(`
@@ -111,12 +109,12 @@ const Forensics = () => {
             }));
 
             setResults(formatted);
-            if (formatted.length === 0) toast.info("No forensic matches found.");
+            if (formatted.length === 0) toast.info("No archive matches found.");
             else toast.success(`Found ${formatted.length} signals matching "${searchTerm}"`);
 
         } catch (err) {
-            console.error("Forensic search failed:", err);
-            toast.error("Forensic index unreachable.");
+            console.error("Archive search failed:", err);
+            toast.error("Technical index unreachable.");
         } finally {
             setIsSearching(false);
         }
@@ -125,9 +123,9 @@ const Forensics = () => {
     return (
         <div className="min-h-screen bg-app-bg text-foreground font-mono transition-colors duration-500">
             <Meta
-                title="Forensic Search Engine | Deep Grep Network Artifacts"
-                description="Search the high-fidelity historical index of the global attack surface. Execute 'grep-style' queries across millions of HTTP headers, service banners, and SSL certificates."
-                keywords="forensic search, grep network, network artifact hunting, historical ip data, banner search, header search, cybersecurity forensics, threat hunting tool"
+                title="Historical Infrastructure Timeline | Asset Archive"
+                description="Search the comprehensive historical index of global infrastructure changes. Identify infrastructure drift and historical service configurations."
+                keywords="infrastructure timeline, asset history, network changes, historical ip data, banner search, header search, threat hunting tool"
             />
             <Header />
 
@@ -135,10 +133,10 @@ const Forensics = () => {
                 <header className="mb-12 space-y-4">
                     <div className="flex items-center gap-3 text-info">
                         <Shield className="w-6 h-6" />
-                        <h1 className="text-3xl font-black uppercase tracking-tighter italic">Forensic_Grep_Engine</h1>
+                        <h1 className="text-3xl font-black uppercase tracking-tighter italic">Infrastructure_Timeline</h1>
                     </div>
                     <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed">
-                        Query the high-fidelity historical index of the global attack surface.
+                        Query the comprehensive historical index of the global attack surface.
                         Search across <span className="text-foreground font-bold">banners</span>,
                         <span className="text-foreground font-bold">headers</span>,
                         <span className="text-foreground font-bold">certificates</span>, and
@@ -261,7 +259,7 @@ const Forensics = () => {
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-xl font-bold uppercase tracking-widest">Awaiting_Instructions</h3>
-                                <p className="text-sm max-w-sm mx-auto">Enter a search query to scan the global forensic archive. Use keywords like server types, header names, or specific banners.</p>
+                                <p className="text-sm max-w-sm mx-auto">Enter a search query to scan the global architectural archive. Use keywords like server types, header names, or specific banners.</p>
                             </div>
                         </div>
                     ) : null}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
-import { Menu, X, Globe, Database, Info, Code, Shield } from "lucide-react";
+import { Menu, X, Globe, Database, Info, Code, Shield, Network } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
@@ -10,7 +10,8 @@ const Header = () => {
   const navLinks = [
     { name: "Discovery", href: "/discovery", icon: Globe, color: "text-success" },
     { name: "Inventory", href: "/inventory", icon: Database, color: "text-info" },
-    { name: "Forensics", href: "/forensics", icon: Shield, color: "text-warning" },
+    { name: "Timeline", href: "/forensics", icon: Shield, color: "text-warning" },
+    { name: "Tactical JS", href: "/tactical-js", icon: Code, color: "text-info" },
     { name: "About", href: "/about", icon: Info, color: "text-muted-foreground" },
     { name: "Docs", href: "/docs", icon: Code, color: "text-muted-foreground" },
   ];

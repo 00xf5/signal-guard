@@ -3,20 +3,20 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const faqs = [
     {
-        question: "How does RiskSignal detect VPNs and Proxies?",
-        answer: "RiskSignal uses a combination of real-time IP metadata analysis and browser-side signal detection. We check if the IP belongs to a known Data Center (Hosting) provider, analyze the connection headers, and detect inconsistencies like Timezone Mismatches between your device and the IP's location."
+        question: "How does RiskSignal map the external attack surface?",
+        answer: "RiskSignal uses a recursive discovery engine that ingests root domains and IP ranges. By correlating Certificate Transparency (CT) logs, Passive DNS, and service finger-printing, the platform builds a comprehensive map of managed and unmanaged (Shadow IT) assets."
     },
     {
-        question: "What is an Anonymity Score?",
-        answer: "The Anonymity Score (0-100%) represents the likelihood that an actor is trying to hide their real identity. A high score is triggered by Tor exit nodes, public VPNs, or device/IP discrepancies that suggest spoofing."
+        question: "What is infrastructure drift detection?",
+        answer: "Infrastructure drift occurs when the state of your network changes—such as a new open port, a certificate renewal, or a DNS change. RiskSignal captures point-in-time snapshots and uses SHA-256 state hashing to alert you the moment your footprint deviates from its known secure state."
     },
     {
-        question: "Can RiskSignal identify residential proxies?",
-        answer: "Yes. By correlating ISP data with connection behavior and ASN reputation, RiskSignal can distinguish between true residential connections and commercial proxy services masquerading as consumers."
+        question: "How does JS-ASM Elite identify leaks?",
+        answer: "The kernel downloads and de-minifies public JavaScript bundles. It then performs AST analysis and pattern matching across 120+ secret types (AWS, Stripe, Firebase) and maps out all internal API endpoints to identify potential logic vulnerabilities."
     },
     {
-        question: "Is my data stored during an IP lookup?",
-        answer: "No. RiskSignal is a privacy-first tool. Lookups are processed in real-time, and we do not log or store individual IP searches, keeping your intelligence gather efforts completely private."
+        question: "Can I monitor multiple organizations?",
+        answer: "Yes. RiskSignal is built for multi-entity visibility. You can manage multiple organizations within the inventory matrix, each with its own isolated asset tree, discovery schedule, and alert configuration."
     }
 ];
 

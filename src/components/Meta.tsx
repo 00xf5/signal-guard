@@ -23,12 +23,12 @@ const Meta = ({
 }: MetaProps) => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : "https://app.risksignal.name.ng/";
     const fullCanonical = canonical || currentUrl;
-    const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — Global Attack Surface Management & Forensic Grep Engine";
+    const fullTitle = title ? `${title} | RiskSignal` : "RiskSignal — Cyber-Asset Attack Surface Management & Reconnaissance Hub";
 
-    const defaultDescription = "RiskSignal is an advanced External Attack Surface Management (EASM) platform. We provide deep forensic IP intelligence, real-time vulnerability scanning, VPN/Proxy detection, and an immutable forensic grep engine for historical network artifacts. Audit domain reputation, scan open ports, and validate security headers instantly.";
+    const defaultDescription = "RiskSignal is a high-performance Cyber-Asset Attack Surface Management (CAASM) platform. We provide deep reconnaissance, automated asset discovery, real-time vulnerability mapping, and distributed threat intelligence. Identify shadow IT, monitor digital footprints, and secure your external attack surface instantly.";
     const fullDescription = description || defaultDescription;
 
-    const defaultKeywords = "ASM, EASM, Attack Surface Management, External Attack Surface Management, IP Intelligence, VPN Detection, Proxy Detection, Tor Detection, Forensic Grep Engine, Network Forensics, IP Reputation API, CVE Vulnerability Scanner, Shadow IT Discovery, Domain Reputation audit, Threat Intelligence Feed, Asset Matrix, Risk Engineering, Cyber Risk Scoring, DMARC Validator, Security Headers, WHOIS lookup, Port Scanner online, Botnet Telemetry, Infrastructure Monitoring.";
+    const defaultKeywords = "ASM, EASM, CAASM, Attack Surface Management, Cyber Asset Discovery, Threat Intelligence, Digital Footprint Mapping, Vulnerability Reconnaissance, Shadow IT Monitoring, External Asset Management, Security Intelligence Platform, Infrastructure Visibility, API Recon, Network Asset Tracker.";
     const fullKeywords = keywords || defaultKeywords;
 
     const defaultJsonLd = {

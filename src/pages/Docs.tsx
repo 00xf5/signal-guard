@@ -15,7 +15,7 @@ const Docs = () => {
         "@type": "TechArticle",
         "headline": "RiskSignal API Documentation",
         "description": "Technical guide and API reference for integrating the RiskSignal IP Intelligence and VPN detection platform.",
-        "url": "https://risksignal-tau.vercel.app/docs",
+        "url": "https://app.risksignal.name.ng/docs",
         "articleSection": "API Guide"
     };
 
@@ -43,11 +43,11 @@ const Docs = () => {
         </div>
     );
 
-    const curlCode = `curl -X GET "https://risksignal-tau.vercel.app/api/scan?ip=8.8.8.8" \\
+    const curlCode = `curl -X GET "https://app.risksignal.name.ng/api/scan?ip=8.8.8.8" \\
      -H "x-api-key: YOUR_24_DIGIT_KEY"`;
 
     const jsCode = `const fetchIpData = async (ip) => {
-  const response = await fetch(\`https://risksignal-tau.vercel.app/api/scan?ip=\${ip}\`, {
+  const response = await fetch(\`https://app.risksignal.name.ng/api/scan?ip=\${ip}\`, {
     headers: {
       'x-api-key': 'YOUR_24_DIGIT_KEY'
     }
@@ -60,7 +60,7 @@ fetchIpData('8.8.8.8').then(console.log);`;
     const pythonCode = `import requests
 
 def scan_ip(ip, api_key):
-    url = f"https://risksignal-tau.vercel.app/api/scan?ip={ip}"
+    url = f"https://app.risksignal.name.ng/api/scan?ip={ip}"
     headers = {"x-api-key": api_key}
     response = requests.get(url, headers=headers)
     return response.json()
@@ -78,7 +78,7 @@ import (
 
 func main() {
     client := &http.Client{}
-    req, _ := http.NewRequest("GET", "https://risksignal-tau.vercel.app/api/scan?ip=8.8.8.8", nil)
+    req, _ := http.NewRequest("GET", "https://app.risksignal.name.ng/api/scan?ip=8.8.8.8", nil)
     req.Header.Set("x-api-key", "YOUR_24_DIGIT_KEY")
     
     resp, _ := client.Do(req)
@@ -92,8 +92,8 @@ func main() {
         <div className="min-h-screen bg-background text-foreground">
             <Meta
                 title="API Documentation & Technical Reference"
-                description="Comprehensive guide for integrating the RiskSignal IP Intelligence API. Documentation for VPN detection, proxy identification, and forensic network audits."
-                keywords="API Documentation, IP Intelligence SDK, VPN Detection Guide, Proxy Detection Reference, RiskSignal Technical Docs"
+                description="Comprehensive guide for integrating the RiskSignal Intelligence API. Documentation for infrastructure mapping, asset discovery, and technical security audits."
+                keywords="API Documentation, Infrastructure Intelligence SDK, Attack Surface Guide, Reconnaissance API Reference, RiskSignal Technical Docs"
                 jsonLd={docsJsonLd}
             />
             <Header />
@@ -124,7 +124,7 @@ func main() {
                             </div>
                             <div className="bg-foreground/5 border border-panel-border rounded-xl p-4 flex items-center gap-3 group">
                                 <span className="px-2 py-0.5 rounded bg-success/20 text-success text-[10px] font-bold tracking-widest uppercase">GET</span>
-                                <code className="text-sm font-mono text-foreground/80 break-all">https://risksignal-tau.vercel.app/api/scan</code>
+                                <code className="text-sm font-mono text-foreground/80 break-all">https://app.risksignal.name.ng/api/scan</code>
                             </div>
                         </section>
 

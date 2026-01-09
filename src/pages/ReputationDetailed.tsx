@@ -168,7 +168,7 @@ const ReputationDetailed = () => {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "RiskSignal Reputation Audit",
-        "url": `https://risksignal-tau.vercel.app/${query}/reputation`,
+        "url": `https://app.risksignal.name.ng/${query}/reputation`,
         "description": `Detailed reputation audit, blacklist check, and email security status for ${query}.`,
         "applicationCategory": "SecurityApplication",
         "featureList": ["Global Blacklist Check", "DMARC/SPF Record Audit", "Domain Trust Scoring"]

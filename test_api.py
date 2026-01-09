@@ -3,7 +3,7 @@ import json
 import sys
 
 # Configuration
-API_URL = "https://risksignal-tau.vercel.app/api/scan" # Production URL
+API_URL = "https://app.risksignal.name.ng/api/scan" # Production URL
 DEFAULT_KEY = "7166c564c535dd419a0c3f10" # The key we saw in Supabase
 TEST_IP = "8.8.8.8"
 

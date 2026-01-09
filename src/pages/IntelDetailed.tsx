@@ -125,7 +125,7 @@ const IntelDetailed = () => {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "RiskSignal Network Audit",
-        "url": `https://risksignal-tau.vercel.app/${query}/detailed`,
+        "url": `https://app.risksignal.name.ng/${query}/detailed`,
         "description": `Detailed forensic security audit and vulnerability scan for target ${query}.`,
         "applicationCategory": "SecurityApplication",
         "featureList": ["Live Port Scanning", "CVE Vulnerability Mapping", "Infrastructure Fingerprinting"]
@@ -176,7 +176,6 @@ const IntelDetailed = () => {
                         const orgName = rootDomain ? rootDomain.split('.')[0] : (intelData.geo_location?.org || query);
                         const org = await AsmService.getOrCreateOrganization(rootDomain || query, orgName);
                         if (org) {
-                            // 1. Track the primary asset
                             const assetId = await AsmService.trackAsset({
                                 org_id: org.id,
                                 asset_type: isIp ? 'ip' : 'domain',
@@ -185,7 +184,6 @@ const IntelDetailed = () => {
                                 metadata_json: { forensic_query: query }
                             });
 
-                            // 2. Track and link the resolved IP if it's a domain
                             if (assetId && !isIp && intelData.network_context?.resolved_ip) {
                                 const ipAssetId = await AsmService.trackAsset({
                                     org_id: org.id,
@@ -203,12 +201,10 @@ const IntelDetailed = () => {
                                 await AsmService.performSubnetScan(org.id, query);
                             }
 
-                            // 4. Discover Related Artifacts
                             if (assetId) {
                                 await AsmService.discoverRelatedArtifacts(org.id, intelData, assetId);
                             }
 
-                            // 5. Record Forensic Exposures
                             (intelData.technical?.ports || []).forEach(async (p: any) => {
                                 const taxonomy = classifyExposure(p.port, p.banner, intelData.technical);
                                 if (taxonomy) {
@@ -307,9 +303,9 @@ const IntelDetailed = () => {
     return (
         <div className="min-h-screen bg-app-bg text-foreground/80 selection:bg-info/30 font-sans">
             <Meta
-                title={`Forensic Audit: ${query}`}
-                description={`Comprehensive forensic security audit and vulnerability scan for target ${query}. Analyze open ports, service banners, and CVE exposures.`}
-                keywords={`IP WHOIS, Port Scanner Online, Service Banner Grabbing, ${query} Security Audit, Forensic IP Intel`}
+                title={`Technical Reconnaissance: ${query}`}
+                description={`Comprehensive security audit and vulnerability mapping for ${query}. Analyze infrastructure configuration, service banners, and external exposure.`}
+                keywords={`Attack Surface Management, Port Scanner, ${query} Security Audit, Infrastructure Recon`}
                 jsonLd={intelJsonLd}
             />
             <style>{`
@@ -797,53 +793,57 @@ const IntelDetailed = () => {
                                         animate={{ opacity: 1 }}
                                         className="space-y-6"
                                     >
+
+                                        {/* Deep Intel Findings (Static) */}
                                         {(data?.technical?.vulnerabilities || []).length > 0 ? (
-                                            data.technical.vulnerabilities.map((v: any, i: number) => (
-                                                <div key={i} className="group relative">
-                                                    <div className="absolute -inset-1 bg-gradient-to-r from-red-500/10 to-transparent blur opacity-0 group-hover:opacity-100 transition duration-1000" />
-                                                    <div className="relative p-8 bg-terminal-bg/10 border border-panel-border rounded-3xl hover:border-red-500/20 transition-all flex items-center justify-between">
-                                                        <div className="flex items-center gap-8">
-                                                            <div className={`w-20 h-20 rounded-2xl border-2 flex flex-col items-center justify-center font-black ${v.cvss > 9 ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-orange-500/10 border-orange-500/30 text-orange-500'
-                                                                }`}>
-                                                                <span className="text-2xl">{v.cvss.toFixed(1)}</span>
-                                                                <span className="text-[8px] uppercase font-mono">CVSS</span>
-                                                            </div>
-                                                            <div>
-                                                                <span className="text-sm font-black text-foreground group-hover:text-info transition-colors">{v.id}</span>
-                                                                <p className="text-xs text-muted-foreground mt-2 max-w-xl leading-relaxed">{v.summary}</p>
-                                                                <div className="mt-4 flex flex-wrap gap-3">
-                                                                    <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Affected_Version: Generic</span>
-                                                                    <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Vect: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span>
-                                                                    {v.exploit_db_id && (
-                                                                        <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[9px] font-mono uppercase text-red-500 font-black animate-pulse">Weaponized_Exploit_Found</span>
-                                                                    )}
+                                            <>
+                                                {(data?.technical?.vulnerabilities || []).map((v: any, i: number) => (
+                                                    <div key={i} className="group relative">
+                                                        <div className="absolute -inset-1 bg-gradient-to-r from-red-500/10 to-transparent blur opacity-0 group-hover:opacity-100 transition duration-1000" />
+                                                        <div className="relative p-8 bg-terminal-bg/10 border border-panel-border rounded-3xl hover:border-red-500/20 transition-all flex items-center justify-between">
+                                                            <div className="flex items-center gap-8">
+                                                                <div className={`w-20 h-20 rounded-2xl border-2 flex flex-col items-center justify-center font-black ${v.cvss > 9 ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-orange-500/10 border-orange-500/30 text-orange-500'
+                                                                    }`}>
+                                                                    <span className="text-2xl">{v.cvss.toFixed(1)}</span>
+                                                                    <span className="text-[8px] uppercase font-mono">CVSS</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-sm font-black text-foreground group-hover:text-info transition-colors">{v.id}</span>
+                                                                    <p className="text-xs text-muted-foreground mt-2 max-w-xl leading-relaxed">{v.summary}</p>
+                                                                    <div className="mt-4 flex flex-wrap gap-3">
+                                                                        <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Affected_Version: Generic</span>
+                                                                        <span className="px-2 py-0.5 bg-background/40 rounded text-[9px] font-mono uppercase text-muted-foreground/80">Vect: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span>
+                                                                        {v.exploit_db_id && (
+                                                                            <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[9px] font-mono uppercase text-red-500 font-black animate-pulse">Weaponized_Exploit_Found</span>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            {v.exploit_db_id && (
+                                                            <div className="flex items-center gap-4">
+                                                                {v.exploit_db_id && (
+                                                                    <a
+                                                                        href={`https://www.exploit-db.com/exploits/${v.exploit_db_id}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex flex-col items-center justify-center p-3 bg-red-500/10 border border-red-500/20 rounded-2xl hover:bg-red-500/20 transition-all group/edb"
+                                                                    >
+                                                                        <div className="text-[10px] font-black text-red-500 uppercase font-mono mb-1">EDB-ID</div>
+                                                                        <div className="text-sm font-bold text-red-400 group-hover/edb:text-white transition-colors">#{v.exploit_db_id}</div>
+                                                                    </a>
+                                                                )}
                                                                 <a
-                                                                    href={`https://www.exploit-db.com/exploits/${v.exploit_db_id}`}
+                                                                    href={v.link}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="flex flex-col items-center justify-center p-3 bg-red-500/10 border border-red-500/20 rounded-2xl hover:bg-red-500/20 transition-all group/edb"
+                                                                    className="p-4 bg-terminal-bg rounded-2xl hover:bg-info text-muted-foreground/80 hover:text-black transition-all"
                                                                 >
-                                                                    <div className="text-[10px] font-black text-red-500 uppercase font-mono mb-1">EDB-ID</div>
-                                                                    <div className="text-sm font-bold text-red-400 group-hover/edb:text-white transition-colors">#{v.exploit_db_id}</div>
+                                                                    <LinkIcon className="w-5 h-5" />
                                                                 </a>
-                                                            )}
-                                                            <a
-                                                                href={v.link}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="p-4 bg-terminal-bg rounded-2xl hover:bg-info text-muted-foreground/80 hover:text-black transition-all"
-                                                            >
-                                                                <LinkIcon className="w-5 h-5" />
-                                                            </a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))
+                                                ))}
+                                            </>
                                         ) : (
                                             <div className="py-40 flex flex-col items-center opacity-40">
                                                 <ShieldCheck className="w-16 h-16 text-emerald-500/10 mb-8" />

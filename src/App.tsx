@@ -17,6 +17,7 @@ import Explorer from "@/pages/Explorer";
 import Forensics from "@/pages/Forensics";
 import Inventory from "@/pages/Inventory";
 import OrgInventory from "@/pages/OrgInventory";
+import TacticalJS from "@/pages/TacticalJS";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inventory/:id" element={<OrgInventory />} />
             <Route path="/forensics" element={<Forensics />} />
+            <Route path="/tactical-js" element={<TacticalJS />} />
             <Route path="/explorer" element={<Explorer />} />
             <Route path="/:query/detailed" element={<IntelDetailed />} />
             <Route path="/:query/reputation" element={<ReputationDetailed />} />

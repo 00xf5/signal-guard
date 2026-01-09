@@ -16,9 +16,9 @@ const About = () => {
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-success/30">
             <Meta
-                title="About RiskSignal Intelligence"
-                description="Learn about the engine behind RiskSignal. We provide high-fidelity IP intelligence audits and infrastructure intelligence for developers and security teams."
-                keywords="RiskSignal Mission, IP Intelligence Technology, Cyber Threat Detection, Security Infrastructure Company"
+                title="About RiskSignal | Attack Surface Reconnaissance"
+                description="Learn about the engine behind RiskSignal. We provide automated asset discovery and infrastructure intelligence for engineering and security teams."
+                keywords="RiskSignal Mission, Infrastructure Intelligence, Cyber Asset Discovery, Attack Surface Management"
                 jsonLd={aboutJsonLd}
             />
             <Header />
@@ -29,8 +29,8 @@ const About = () => {
                         <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
                             Modern <span className="text-gradient">Intelligence.</span>
                         </h1>
-                        <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                            RiskSignal provides deep infrastructure intelligence to help developers and security teams understand who is connecting to their systems.
+                        <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl text-center lg:text-left">
+                            RiskSignal provides deep infrastructure intelligence to help security teams map their digital footprint and identify hidden risks.
                         </p>
                     </div>
 

@@ -45,8 +45,8 @@ const Inventory = () => {
     return (
         <div className="min-h-screen bg-app-bg text-foreground/80 font-sans">
             <Meta
-                title="Inventory Control | Attack Surface Management Matrix"
-                description="Comprehensive asset inventory and attack surface mapping. Monitor domain graphs, IP ranges, and shadow IT infrastructure across your entire organization."
+                title="Global Asset Inventory | Attack Surface Matrix"
+                description="Comprehensive infrastructure inventory and attack surface mapping. Monitor domain graphs, IP ranges, and shadow IT infrastructure across organizations."
                 keywords="attack surface management, asm, easm, shadow it detection, asset inventory graph, infrastructure monitoring, risk management dashboard"
             />
             <Header />
@@ -56,10 +56,10 @@ const Inventory = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
                         <h1 className="text-3xl font-black tracking-tighter text-foreground italic flex items-center gap-3">
-                            <Database className="w-8 h-8 text-info" /> INVENTORY_CONTROL
+                            <Database className="w-8 h-8 text-info" /> ASSET_INVENTORY
                         </h1>
                         <p className="text-muted-foreground font-mono text-xs uppercase tracking-[0.2em] mt-2">
-                            Managing {orgs.length} Active Attack Surfaces
+                            Tracking {orgs.length} Managed Asset Clusters
                         </p>
                     </div>
 
@@ -101,7 +101,6 @@ const Inventory = () => {
                                 onClick={() => navigate(`/inventory/${org.id}`)}
                                 className="group p-8 bg-panel-bg/30 border border-panel-border rounded-[2.5rem] hover:border-info/30 transition-all duration-500 cursor-pointer relative overflow-hidden"
                             >
-                                {/* Decorative elements */}
                                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-info/5 rounded-full blur-3xl group-hover:bg-info/10 transition-colors" />
 
                                 <div className="flex items-start justify-between mb-8">
