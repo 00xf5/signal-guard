@@ -68,7 +68,11 @@ const InventoryTacticalSidebar: React.FC<InventorySidebarProps> = ({
                                     </Link>
                                     <Link to="/forensics" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-warning/30 transition-all group">
                                         <Shield className="w-4 h-4 text-warning" />
-                                        <span className="text-xs font-bold text-foreground group-hover:text-warning">Forensics</span>
+                                        <span className="text-xs font-bold text-foreground group-hover:text-warning">Timeline</span>
+                                    </Link>
+                                    <Link to="/tactical-js" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-success/30 transition-all group">
+                                        <Terminal className="w-4 h-4 text-success" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-success">Tactical</span>
                                     </Link>
                                     <Link to="/docs" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
                                         <Code className="w-4 h-4 text-muted-foreground" />

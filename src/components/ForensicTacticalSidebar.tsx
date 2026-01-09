@@ -70,7 +70,11 @@ const ForensicTacticalSidebar: React.FC<ForensicSidebarProps> = ({
                                     </Link>
                                     <Link to="/forensics" className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl border-warning/30 transition-all group">
                                         <Shield className="w-4 h-4 text-warning" />
-                                        <span className="text-xs font-bold text-white">Forensics</span>
+                                        <span className="text-xs font-bold text-white">Timeline</span>
+                                    </Link>
+                                    <Link to="/tactical-js" className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl hover:border-success/30 transition-all group">
+                                        <Terminal className="w-4 h-4 text-success" />
+                                        <span className="text-xs font-bold text-white group-hover:text-success">Tactical</span>
                                     </Link>
                                     <Link to="/docs" className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl hover:border-white/30 transition-all group">
                                         <Code className="w-4 h-4 text-muted-foreground" />

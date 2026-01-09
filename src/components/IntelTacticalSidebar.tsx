@@ -85,7 +85,11 @@ const IntelTacticalSidebar: React.FC<TacticalSidebarProps> = ({ isOpen, onClose,
                                     </Link>
                                     <Link to="/forensics" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-warning/30 transition-all group">
                                         <Shield className="w-4 h-4 text-warning" />
-                                        <span className="text-xs font-bold text-foreground group-hover:text-warning">Forensics</span>
+                                        <span className="text-xs font-bold text-foreground group-hover:text-warning">Timeline</span>
+                                    </Link>
+                                    <Link to="/tactical-js" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-success/30 transition-all group">
+                                        <Terminal className="w-4 h-4 text-success" />
+                                        <span className="text-xs font-bold text-foreground group-hover:text-success">Tactical</span>
                                     </Link>
                                     <Link to="/docs" className="flex items-center gap-2 p-3 bg-terminal-bg/50 border border-panel-border rounded-xl hover:border-foreground/30 transition-all group">
                                         <Code className="w-4 h-4 text-muted-foreground" />
@@ -143,6 +147,20 @@ const IntelTacticalSidebar: React.FC<TacticalSidebarProps> = ({ isOpen, onClose,
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-2">
+                                    <Link
+                                        to={`/tactical-js?domain=${data?.query}`}
+                                        className="flex items-center justify-between p-4 bg-success/5 border border-success/20 rounded-xl hover:bg-success/10 transition-all group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Terminal className="w-4 h-4 text-success" />
+                                            <div className="text-left">
+                                                <div className="text-xs font-bold text-foreground">Tactical JS Recon</div>
+                                                <div className="text-[9px] text-muted-foreground">Map active JS attack surface</div>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-success transition-all" />
+                                    </Link>
+
                                     <button
                                         onClick={handleCopyAll}
                                         className="flex items-center justify-between p-4 bg-info/5 border border-info/20 rounded-xl hover:bg-info/10 transition-all group"

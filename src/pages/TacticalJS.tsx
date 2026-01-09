@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { satelliteClient } from "@/lib/satelliteClient";
 import Meta from "@/components/Meta";
 import { DiscordWebhookModal } from "@/components/tactical/DiscordWebhookModal";
-import { LiveMetricsSidebar } from "@/components/tactical/LiveMetricsSidebar";
+import { TacticalSidebar } from "@/components/tactical/TacticalSidebar";
 import { CriticalAssetsTab } from "@/components/tactical/CriticalAssetsTab";
 import { EndpointsTab } from "@/components/tactical/EndpointsTab";
 
@@ -131,10 +132,11 @@ const TacticalJS = () => {
     useEffect(() => {
         let interval: any;
         if (isPolling && query) {
-            interval = setInterval(() => fetchLiveResults(query.trim()), 5000);
+            interval = setInterval(() => fetchLiveResults(query.trim()), 3000);
         }
         return () => clearInterval(interval);
     }, [isPolling, query, fetchLiveResults]);
+
 
     const handleRunScan = useCallback(async (e?: React.FormEvent, targetQuery?: string) => {
         if (e) e.preventDefault();
@@ -204,16 +206,22 @@ const TacticalJS = () => {
 
     useEffect(() => {
         // Stealth Warmup: Use an Image pulse to wake up the Render engine silently
-        // This avoids CORS/401 console errors while still triggering the server to wake from sleep
         const img = new Image();
         img.src = `https://jsasm.onrender.com/ping?t=${Date.now()}`;
 
         const domainParam = searchParams.get("domain");
         if (domainParam) {
             setQuery(domainParam);
+        }
+    }, [searchParams]);
+
+    // Separate useEffect for auto-run to ensure handleRunScan is fully initialized
+    useEffect(() => {
+        const domainParam = searchParams.get("domain");
+        if (domainParam && !result && !isLoading) {
             handleRunScan(undefined, domainParam);
         }
-    }, [searchParams, handleRunScan]);
+    }, [searchParams, handleRunScan, result, isLoading]);
 
     const handleExportJSON = () => {
         if (!result) return;
@@ -353,26 +361,31 @@ const TacticalJS = () => {
 
                 {/* Sidebar - Desktop Only */}
                 <div className="hidden md:flex">
-                    {result && (
-                        <LiveMetricsSidebar result={result} scanMetadata={scanMetadata} />
-                    )}
+                    <TacticalSidebar result={result} scanMetadata={scanMetadata} />
                 </div>
 
                 {/* Mobile Metrics Drawer */}
-                {mobileMetricsOpen && result && (
-                    <div className="md:hidden fixed inset-0 z-[60] flex justify-end">
-                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMetricsOpen(false)} />
-                        <div className="relative w-72 bg-[#0a0a0c] border-l border-white/10 h-full overflow-y-auto animate-in slide-in-from-right duration-300">
-                            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
-                                <h3 className="text-xs font-black uppercase tracking-widest text-success">Deployment Metrics</h3>
-                                <Button variant="ghost" size="icon" onClick={() => setMobileMetricsOpen(false)} className="h-8 w-8 text-muted-foreground">
-                                    <X className="w-4 h-4" />
-                                </Button>
-                            </div>
-                            <LiveMetricsSidebar result={result} scanMetadata={scanMetadata} />
+                <AnimatePresence>
+                    {mobileMetricsOpen && (
+                        <div className="md:hidden fixed inset-0 z-[60] flex justify-end">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMetricsOpen(false)} />
+                            <motion.div
+                                initial={{ x: "100%" }}
+                                animate={{ x: 0 }}
+                                exit={{ x: "100%" }}
+                                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                                className="relative w-[300px] bg-background h-full shadow-2xl"
+                            >
+                                <TacticalSidebar
+                                    result={result}
+                                    scanMetadata={scanMetadata}
+                                    isMobile={true}
+                                    onClose={() => setMobileMetricsOpen(false)}
+                                />
+                            </motion.div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </AnimatePresence>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-hidden flex flex-col">

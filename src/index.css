@@ -370,6 +370,15 @@
   }
 }
 
+@keyframes digital-rain {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0%); }
+}
+
+.animate-digital-rain {
+  animation: digital-rain 20s linear infinite;
+}
+
 /* Print & Executive Report Optimization */
 @media print {
   .no-print {
